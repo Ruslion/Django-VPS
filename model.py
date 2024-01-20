@@ -2,6 +2,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+import datetime
 
 from tensorflow.keras import preprocessing
 
@@ -43,7 +44,11 @@ def model_design(EPOCHS, x_train, y_train, x_test, y_test, class_weights_dict):
         epochs=EPOCHS,
         validation_data = (x_test, y_test)
             )
+
+    x = datetime.datetime.now()
+    model_name = "models/" + x.strftime("%d-%m-%Y") + ".hd5"
+    model.save(model_name,  save_format = 'h5')
     
+    print(model_name)
     print(max(history.history['val_PR']))
     
-    return model
