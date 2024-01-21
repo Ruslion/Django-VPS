@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import time
 
+MAs=(3, 6, 12, 24, 48, 96, 192, 384)
 
 # convert string to datetime object
 UNIX_TIME_START = datetime.strptime('1970-01-01 00:00:00.000', '%Y-%m-%d %H:%M:%S.%f')
@@ -160,7 +161,7 @@ def marking_hold_wait_actions(df):
             continue
     return df
 
-def adding_MAs(df, col_label, MAs=[3, 6, 12, 24, 48, 96, 192, 384]):
+def adding_MAs(df, col_label, MAs=MAs):
     '''
     This function adds different moving averages to the dataframe.
 
@@ -173,7 +174,7 @@ def adding_MAs(df, col_label, MAs=[3, 6, 12, 24, 48, 96, 192, 384]):
     
     return df
 
-def adding_ratio(df, col_label, MAs=[3, 6, 12, 24, 48, 96, 192, 384]):
+def adding_ratio(df, col_label, MAs=MAs):
     '''
     This function adds different ratios of col_label with moving averages to the dataframe.
 
@@ -250,3 +251,19 @@ def volume_by_close(df):
     df['volume_by_close'] = df['volume']* df['close']
     return df
 
+def rsi(df, col_label, MAs=MAs):
+    '''
+    This function adds different RSI values to the dataframe based on the list of periods.
+
+    '''
+    for period in MAs:
+        delta = df[col_label].diff()
+        delta = delta[1:]
+        up, down = delta.copy(), delta.copy()
+        up[up < 0] = 0
+        down[down > 0] = 0
+        AVG_Gain = up.rolling(period).mean()
+        AVG_Loss = abs(down.rolling(period).mean())
+        RS = AVG_Gain/AVG_Loss
+        df['RSI_'+ str(period)] = 100.0 - (100.0 / (1.0 + RS))
+    return df

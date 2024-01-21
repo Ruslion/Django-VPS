@@ -14,7 +14,7 @@ def model_design(EPOCHS, x_train, y_train, x_test, y_test, class_weights_dict):
     x = normal_layer(inputs)
     x = layers.LSTM(x_train.shape[1], activation="relu", return_sequences=True)(x)
     x = layers.LSTM(x_train.shape[1], activation="relu")(x)
-    x = layers.Dense(x_train.shape[1] // 2, activation="relu")(x)
+    # x = layers.Dense(x_train.shape[1] // 2, activation="relu")(x)
     output_layer = layers.Dense(len(class_weights_dict), name='output', activation='softmax' ) (x)
     # output_layer = layers.Dense(1, name='output', activation='softmax') (x)
     
