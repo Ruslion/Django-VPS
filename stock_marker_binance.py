@@ -160,7 +160,7 @@ def marking_hold_wait_actions(df):
             continue
     return df
 
-def adding_MAs(df, col_label, MAs=[3, 6, 12, 24, 48, 96, 192, 384, 768]):
+def adding_MAs(df, col_label, MAs=[3, 6, 12, 24, 48, 96, 192, 384]):
     '''
     This function adds different moving averages to the dataframe.
 
@@ -173,7 +173,7 @@ def adding_MAs(df, col_label, MAs=[3, 6, 12, 24, 48, 96, 192, 384, 768]):
     
     return df
 
-def adding_ratio(df, col_label, MAs=[3, 6, 12, 24, 48, 96, 192, 384, 768]):
+def adding_ratio(df, col_label, MAs=[3, 6, 12, 24, 48, 96, 192, 384]):
     '''
     This function adds different ratios of col_label with moving averages to the dataframe.
 
