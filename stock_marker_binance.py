@@ -161,7 +161,7 @@ def marking_hold_wait_actions(df):
             continue
     return df
 
-def adding_MAs(df, col_label, MAs=MAs):
+def adding_MAs(df, col_label_list, MAs=MAs):
     '''
     This function adds different moving averages to the dataframe.
 
@@ -169,12 +169,13 @@ def adding_MAs(df, col_label, MAs=MAs):
             col_lable - the name of the column to calculate the MAs for.
     Output: df - process dataframe
     '''
-    for period in MAs:
-        df['MA'+ str(period) +'_' + col_label]=df[col_label].rolling(period).mean()
+    for col_label in col_label_list:
+        for period in MAs:
+            df['MA'+ str(period) +'_' + col_label]=df[col_label].rolling(period).mean()
     
     return df
 
-def adding_ratio(df, col_label, MAs=MAs):
+def adding_ratio(df, col_label_list, prefix_list, MAs=MAs):
     '''
     This function adds different ratios of col_label with moving averages to the dataframe.
 
@@ -182,8 +183,10 @@ def adding_ratio(df, col_label, MAs=MAs):
             col_lable - the name of the column to calculate the ratios for.
     Output: df - process dataframe
     '''
-    for period in MAs:
-        df['RATIO_'+ col_label + '_and_MA' + str(period)] = df[col_label] / df['MA'+ str(period) +'_' + col_label]
+    for col_label in col_label_list:
+        for period in MAs:
+            for prefix in prefix_list:
+                df['RATIO_'+ col_label + '_and_' + prefix + str(period)] = df[col_label] / df[prefix + str(period) +'_' + col_label]
 
     return df
 
@@ -266,4 +269,13 @@ def rsi(df, col_label, MAs=MAs):
         AVG_Loss = abs(down.rolling(period).mean())
         RS = AVG_Gain/AVG_Loss
         df['RSI_'+ str(period)] = 100.0 - (100.0 / (1.0 + RS))
+    return df
+
+def std(df, col_label, MAs=MAs):
+    '''
+    This function adds different standard deviation values to the dataframe based on the list of periods.
+
+    '''
+    for period in MAs:
+        df['STD'+ str(period) +'_' + col_label] = df[col_label].rolling(period).std()
     return df

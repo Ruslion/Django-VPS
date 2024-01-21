@@ -12,9 +12,13 @@ def model_design(EPOCHS, x_train, y_train, x_test, y_test, class_weights_dict):
     inputs = keras.Input(shape=(x_train.shape[1],x_train.shape[2]), name='Input')
 
     x = normal_layer(inputs)
-    x = layers.LSTM(x_train.shape[1], activation="relu", return_sequences=True)(x)
-    x = layers.LSTM(x_train.shape[1], activation="relu")(x)
-    # x = layers.Dense(x_train.shape[1] // 2, activation="relu")(x)
+    x = layers.LSTM(x_train.shape[2], activation="relu", return_sequences=True)(x)
+    x = layers.LSTM(x_train.shape[2], activation="relu", return_sequences=True)(x)
+    x = layers.LSTM(x_train.shape[2], activation="relu")(x)
+    # x = layers.Dense(x_train.shape[2] // 2, activation="relu")(x)
+    # x = layers.Dense(x_train.shape[2] // 2, activation="relu")(x)
+    # x = layers.Dense(x_train.shape[2] // 2, activation="relu")(x)
+    
     output_layer = layers.Dense(len(class_weights_dict), name='output', activation='softmax' ) (x)
     # output_layer = layers.Dense(1, name='output', activation='softmax') (x)
     
@@ -28,7 +32,7 @@ def model_design(EPOCHS, x_train, y_train, x_test, y_test, class_weights_dict):
         loss={
             "output": keras.losses.CategoricalCrossentropy(name="loss")
             },
-        weighted_metrics = [keras.metrics.CategoricalAccuracy(name="cat_acc", dtype=None),
+        weighted_metrics = [keras.losses.CategoricalCrossentropy(name="cat_cross"),
                   keras.metrics.AUC(name="PR", curve='PR')],
         # metrics=[keras.metrics.CategoricalAccuracy(name="cat_acc", dtype=None),
         #           keras.metrics.AUC(name="auc")]
