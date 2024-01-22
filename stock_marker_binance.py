@@ -254,28 +254,31 @@ def volume_by_close(df):
     df['volume_by_close'] = df['volume']* df['close']
     return df
 
-def rsi(df, col_label, MAs=MAs):
+def rsi(df, col_label_list, MAs=MAs):
     '''
     This function adds different RSI values to the dataframe based on the list of periods.
 
     '''
-    for period in MAs:
-        delta = df[col_label].diff()
-        delta = delta[1:]
-        up, down = delta.copy(), delta.copy()
-        up[up < 0] = 0
-        down[down > 0] = 0
-        AVG_Gain = up.rolling(period).mean()
-        AVG_Loss = abs(down.rolling(period).mean())
-        RS = AVG_Gain/AVG_Loss
-        df['RSI_'+ str(period)] = 100.0 - (100.0 / (1.0 + RS))
+    for col_label in col_label_list:
+        for period in MAs:
+            delta = df[col_label].diff()
+            delta = delta[1:]
+            up, down = delta.copy(), delta.copy()
+            up[up < 0] = 0
+            down[down > 0] = 0
+            AVG_Gain = up.rolling(period).mean()
+            AVG_Loss = abs(down.rolling(period).mean())
+            RS = AVG_Gain/AVG_Loss
+            df['RSI_'+ str(period) + '_' + col_label] = 100.0 - (100.0 / (1.0 + RS))
+
     return df
 
-def std(df, col_label, MAs=MAs):
+def std(df, col_label_list, MAs=MAs):
     '''
     This function adds different standard deviation values to the dataframe based on the list of periods.
 
     '''
-    for period in MAs:
-        df['STD'+ str(period) +'_' + col_label] = df[col_label].rolling(period).std()
+    for col_label in col_label_list:
+        for period in MAs:
+            df['STD'+ str(period) +'_' + col_label] = df[col_label].rolling(period).std()
     return df

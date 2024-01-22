@@ -5,19 +5,29 @@ from tensorflow.keras import layers
 
 from tensorflow.keras.layers.experimental import preprocessing
 
-def model_design(EPOCHS, x_train, y_train, x_test, y_test, class_weights_dict):
+def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
     normal_layer = preprocessing.Normalization()
     normal_layer.adapt(x_train)
     
-    inputs = keras.Input(shape=(x_train.shape[1],x_train.shape[2]), name='Input')
+    time_step = x_train.shape[1]
+    num_features = x_train.shape[2]
+
+    inputs = keras.Input(shape=(time_step, num_features), name='Input')
 
     x = normal_layer(inputs)
-    x = layers.LSTM(x_train.shape[2], activation="relu", return_sequences=True)(x)
-    x = layers.LSTM(x_train.shape[2], activation="relu", return_sequences=True)(x)
-    x = layers.LSTM(x_train.shape[2], activation="relu")(x)
-    # x = layers.Dense(x_train.shape[2] // 2, activation="relu")(x)
-    # x = layers.Dense(x_train.shape[2] // 2, activation="relu")(x)
-    # x = layers.Dense(x_train.shape[2] // 2, activation="relu")(x)
+    # x = layers.LSTM(num_features, activation="relu", return_sequences=True)(x)
+    # x = layers.LSTM(num_features , activation="relu", return_sequences=True)(x)
+    x = layers.TimeDistributed(layers.Conv1D(filters=64, kernel_size=1, activation='relu'), 
+                               input_shape=(None, time_step, num_features)
+                               ) (x)
+    
+    # x = layers.LSTM(num_features, activation="relu")(x)
+    
+    x = layers.Flatten() (x)
+    x = layers.Dense(x.shape[1], activation="relu")(x)
+    
+    # x = layers.Dense(num_features // 2, activation="relu")(x)
+    # x = layers.Dense(num_features // 2, activation="relu")(x)
     
     output_layer = layers.Dense(len(class_weights_dict), name='output', activation='softmax' ) (x)
     # output_layer = layers.Dense(1, name='output', activation='softmax') (x)
@@ -34,8 +44,7 @@ def model_design(EPOCHS, x_train, y_train, x_test, y_test, class_weights_dict):
             },
         weighted_metrics = [keras.losses.CategoricalCrossentropy(name="cat_cross"),
                   keras.metrics.AUC(name="PR", curve='PR')],
-        # metrics=[keras.metrics.CategoricalAccuracy(name="cat_acc", dtype=None),
-        #           keras.metrics.AUC(name="auc")]
+        
             
                 )
 
@@ -43,6 +52,7 @@ def model_design(EPOCHS, x_train, y_train, x_test, y_test, class_weights_dict):
         {"Input": x_train},
         {"output":y_train},
         # class_weight=class_weights_dict,
+        # batch_size=8,
         callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_PR', patience=20, mode='max', restore_best_weights=True)],
         epochs=EPOCHS,
         validation_data = (x_test, y_test),
