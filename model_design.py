@@ -16,10 +16,11 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
 
     x = normal_layer(inputs)
     # x = layers.LSTM(num_features, activation="relu", return_sequences=True)(x)
-    # x = layers.LSTM(num_features , activation="relu", return_sequences=True)(x)
-    x = layers.TimeDistributed(layers.Conv1D(filters=64, kernel_size=1, activation='relu'), 
-                               input_shape=(None, time_step, num_features)
-                               ) (x)
+    x = layers.LSTM(num_features , activation="relu", return_sequences=True)(x)
+    x = layers.LSTM(num_features // 2 , activation="relu", return_sequences=True)(x)
+    x = layers.LSTM(num_features // 4 , activation="relu")(x)
+    x = layers.LSTM(num_features , activation="relu")(x)
+    
     
     # x = layers.LSTM(num_features, activation="relu")(x)
     
@@ -53,7 +54,7 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
         {"output":y_train},
         # class_weight=class_weights_dict,
         # batch_size=8,
-        callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_PR', patience=20, mode='max', restore_best_weights=True)],
+        callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_PR', patience=50, mode='max', restore_best_weights=True)],
         epochs=EPOCHS,
         validation_data = (x_test, y_test),
         verbose=0
