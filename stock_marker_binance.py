@@ -243,7 +243,7 @@ def import_stock_data(symbol, interval,  startTime=None, endTime=None, limit=500
         print('i = ', i)
         
 
-    df[0]= df[0].apply (lambda x: UNIX_TIME_START + timedelta(milliseconds=x))
+    df[0]= df[0].apply (lambda x: UNIX_TIME_START + timedelta(milliseconds=x)) # Converting UNIX time to datetime.
     return df
 
 def volume_by_close(df):
