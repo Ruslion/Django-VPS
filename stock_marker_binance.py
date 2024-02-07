@@ -19,7 +19,8 @@ def sorting_timestamp(df):
         print(f'{e} field not found')
         return
         
-    df.sort_values(by='timestamp') # Sorting by timestamp before iteration
+    df.sort_values(by='timestamp', inplace=True) # Sorting by timestamp before iteration
+    df['timestamp'] = df['timestamp'].apply(lambda x: x.tz_localize(None)) # Removing timezone info
     df['timestamp']=df['timestamp'].astype('datetime64[ns]')
     return df
 
