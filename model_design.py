@@ -17,8 +17,8 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
     x = normal_layer(inputs)
 
     
-    x = layers.LSTM(num_features, activation="leaky_relu", return_sequences=True)(x)
-    x = layers.LSTM(num_features // 8, activation="leaky_relu")(x)
+    x = layers.LSTM(num_features * 3, activation="leaky_relu", return_sequences=True)(x)
+    x = layers.LSTM(num_features * 2 , activation="leaky_relu")(x)
     # x = layers.LSTM(num_features * 2, activation="relu", return_sequences=True)(x)
     # x = layers.LSTM(num_features, activation="relu", return_sequences=True)(x)
     # x = layers.LSTM(num_features // 2, activation="relu", return_sequences=True)(x)
@@ -28,8 +28,8 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
 
         
     
-    x = layers.Dense(x.shape[1], activation="leaky_relu")(x)
-    x = layers.Dense(4, activation="leaky_relu")(x)
+    # x = layers.Dense(x.shape[1], activation="leaky_relu")(x)
+    # x = layers.Dense(4, activation="leaky_relu")(x)
     
      
     
