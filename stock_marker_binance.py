@@ -18,10 +18,15 @@ def sorting_timestamp(df):
     except KeyError as e:
         print(f'{e} field not found')
         return
-        
+    
+    # df['timestamp']=df['timestamp'].astype('datetime64[ns]')
+
+    df['timestamp'] = pd.to_datetime(df['timestamp'], format="%d/%m/%Y %H:%M")
+
     df.sort_values(by='timestamp', inplace=True) # Sorting by timestamp before iteration
+    
     df['timestamp'] = df['timestamp'].apply(lambda x: x.tz_localize(None)) # Removing timezone info
-    df['timestamp']=df['timestamp'].astype('datetime64[ns]')
+    
     return df
 
 def marking_buy_sell_actions(df, min_profit=3, drawdown = 1):
