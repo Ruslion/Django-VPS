@@ -15,26 +15,26 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
 
     x = normal_layer(inputs)
 
-    x = layers.Dense(num_features * 4, activation="relu")(x)
+    x = layers.Dense(num_features * 4, activation="leaky_relu")(x)
     
-    x = layers.Dense(num_features * 3, activation="relu")(x)
+    x = layers.Dense(num_features * 3, activation="leaky_relu")(x)
 
     
-    x = layers.Dense(num_features * 2, activation="relu")(x)
-
-    
-    
-    x = layers.Dense(num_features, activation="relu")(x)
+    # x = layers.Dense(num_features * 2, activation="leaky_relu")(x)
 
     
     
-    x = layers.Dense(num_features // 2, activation="relu")(x)
+    # x = layers.Dense(num_features, activation="leaky_relu")(x)
 
     
-    x = layers.Dense(num_features // 4, activation="relu")(x)
-    x = layers.Dense(num_features // 8, activation="relu")(x)
     
-    x = layers.Dense(num_features // 16, activation="relu")(x)
+    # x = layers.Dense(num_features // 2, activation="leaky_relu")(x)
+
+    
+    # x = layers.Dense(num_features // 4, activation="leaky_relu")(x)
+    # x = layers.Dense(num_features // 8, activation="leaky_relu")(x)
+    
+    # x = layers.Dense(num_features // 16, activation="leaky_relu")(x)
     
     output_layer = layers.Dense(len(class_weights_dict), name='output', activation='softmax' ) (x)
     # output_layer = layers.Dense(1, name='output', activation='softmax') (x)
@@ -45,12 +45,13 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
                     )
     
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=0.00001),
+        optimizer=keras.optimizers.Adam(learning_rate=1e-08),
         loss={
             "output": keras.losses.CategoricalCrossentropy(name="loss")
             },
         weighted_metrics = [keras.losses.CategoricalCrossentropy(name="cat_cross"),
-                  keras.metrics.AUC(name="PR", curve='PR')],
+                #   keras.metrics.AUC(name="PR", curve='PR', num_thresholds=1000),
+                  keras.metrics.SensitivityAtSpecificity(0.85, name="sens_at_spec", num_thresholds=1000),],
         
             
                 )
@@ -60,7 +61,7 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
         {"output":y_train},
         # class_weight=class_weights_dict,
         # batch_size=8,
-        callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_PR', patience=50, mode='max', restore_best_weights=True)],
+        callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_sens_at_spec', patience=100, restore_best_weights=True)],
         epochs=EPOCHS,
         validation_data = (x_test, y_test),
         verbose=0

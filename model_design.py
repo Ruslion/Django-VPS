@@ -27,8 +27,8 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
     # x = layers.LSTM(num_features // 16, activation="relu")(x)
 
         
-    
-    # x = layers.Dense(x.shape[1], activation="leaky_relu")(x)
+    x = layers.Flatten()(x)
+    x = layers.Dense(x.shape[1], activation="leaky_relu")(x)
     # x = layers.Dense(4, activation="leaky_relu")(x)
     
      
@@ -42,7 +42,7 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
                     )
     
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=0.00000001),
+        optimizer=keras.optimizers.Adam(learning_rate=1e-08),
         loss={
             "output": keras.losses.CategoricalCrossentropy(name="loss")
             },
