@@ -3,10 +3,10 @@ import plotly.graph_objects as go
 
 def chart_with_markers(df_result, close_col, action_col):
     df_sell = df_result.loc[df_result[action_col] == 'S' ]
-    df_sell[close_col] = df_sell[close_col].apply(lambda x: x*1.1)
+    df_sell[close_col] = df_sell[close_col].apply(lambda x: x*1.05)
 
     df_buy = df_result.loc[df_result[action_col] == 'B' ]
-    df_buy[close_col] = df_buy[close_col].apply(lambda x: x*0.9)
+    df_buy[close_col] = df_buy[close_col].apply(lambda x: x*0.95)
     
     fig2 = go.Figure(data=[go.Scatter(x=df_result['timestamp'],
                 

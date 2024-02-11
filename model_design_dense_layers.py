@@ -15,22 +15,27 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
 
     x = normal_layer(inputs)
 
-    x = layers.Dense(num_features * 4, activation="leaky_relu")(x)
+    x = layers.Dense(num_features * 10, activation="leaky_relu")(x)
     
-    x = layers.Dense(num_features * 3, activation="leaky_relu")(x)
+    x = layers.Dense(num_features * 9, activation="leaky_relu")(x)
+
+    x = layers.Dense(num_features * 8, activation="leaky_relu")(x)
+
+    x = layers.Dense(num_features * 7, activation="leaky_relu")(x)
+
+    # x = layers.Dense(num_features * 3, activation="tanh")(x)
+
+    # x = layers.Dense(num_features * 2, activation="tanh")(x)
+
+    
 
     
     # x = layers.Dense(num_features * 2, activation="leaky_relu")(x)
 
-    
-    
     # x = layers.Dense(num_features, activation="leaky_relu")(x)
 
-    
-    
     # x = layers.Dense(num_features // 2, activation="leaky_relu")(x)
 
-    
     # x = layers.Dense(num_features // 4, activation="leaky_relu")(x)
     # x = layers.Dense(num_features // 8, activation="leaky_relu")(x)
     
@@ -45,7 +50,7 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
                     )
     
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=1e-08),
+        optimizer=keras.optimizers.Adam(learning_rate=1e-5),
         loss={
             "output": keras.losses.CategoricalCrossentropy(name="loss")
             },
