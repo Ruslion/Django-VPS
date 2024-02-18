@@ -17,9 +17,11 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
     x = normal_layer(inputs)
 
     # x = layers.Dropout(0.2) (x)
-    x = layers.LSTM(num_features * 4, activation="leaky_relu", return_sequences=True)(x)
     x = layers.LSTM(num_features * 2, activation="leaky_relu", return_sequences=True)(x)
-    x = layers.LSTM(num_features, activation="leaky_relu")(x)
+    x = layers.LSTM(num_features * 3, activation="leaky_relu", return_sequences=True)(x)
+    x = layers.LSTM(num_features, activation="leaky_relu", return_sequences=True)(x)
+
+    x = layers.LSTM(num_features // 2, activation="leaky_relu")(x) 
     # x = layers.LSTM(num_features, activation="relu", return_sequences=True)(x)
     # x = layers.LSTM(num_features // 2, activation="relu", return_sequences=True)(x)
     # x = layers.LSTM(num_features // 4, activation="relu", return_sequences=True)(x)
@@ -59,7 +61,7 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
         # class_weight=class_weights_dict,
         # batch_size=8,
         callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_sens_at_spec', patience=60, mode='max', 
-                                                    restore_best_weights=True),
+                                                    restore_best_weights=False),
                     tf.keras.callbacks.ProgbarLogger()],
         epochs=EPOCHS,
         validation_data = (x_test, y_test),

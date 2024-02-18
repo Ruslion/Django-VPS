@@ -30,12 +30,15 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
 
     
 
+   
     
-    x = layers.Dense(num_features * 2, activation="leaky_relu")(x)
+    # x = layers.Dense(num_features, activation="leaky_relu")(x)
 
-    x = layers.Dense(num_features, activation="leaky_relu")(x)
+    # x = layers.Dense(num_features * 2, activation="leaky_relu")(x)
 
-    x = layers.Dense(num_features // 2, activation="leaky_relu")(x)
+    # x = layers.Dense(num_features, activation="leaky_relu")(x)
+
+    x = layers.Dense(int(num_features * 0.8), activation="leaky_relu")(x)
 
     # x = layers.Dense(num_features // 4, activation="leaky_relu")(x)
     # x = layers.Dense(num_features // 8, activation="leaky_relu")(x)
@@ -67,7 +70,7 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
         {"output":y_train},
         # class_weight=class_weights_dict,
         # batch_size=8,
-        callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_sens_at_spec', mode='max', patience=30, restore_best_weights=True)],
+        callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_sens_at_spec', mode='max', patience=30, restore_best_weights=False)],
         epochs=EPOCHS,
         validation_data = (x_test, y_test),
         verbose=0
