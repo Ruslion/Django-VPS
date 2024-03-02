@@ -22,7 +22,7 @@ def model_design(EPOCHS,  x_train, y_train, x_test, y_test, class_weights_dict):
     x = layers.Dense(int(num_features * 2.1), activation="leaky_relu")(x)
     x = layers.Dense(int(num_features * 1), activation="leaky_relu")(x)
     x = layers.Dense(int(num_features * 0.25), activation="leaky_relu")(x)
-    x = layers.Dense(8, activation="leaky_relu")(x)
+    # x = layers.Dense(7, activation="leaky_relu")(x)
 
     # x = layers.Dense(num_features // 4, activation="leaky_relu")(x)
     # x = layers.Dense(num_features // 8, activation="leaky_relu")(x)
