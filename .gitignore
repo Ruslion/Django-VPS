@@ -1,5 +1,6 @@
 *.csv
 __pycache__/
 models/
+my_vps_project/videopoker/
 database.ini
 config.py
