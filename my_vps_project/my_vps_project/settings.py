@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'trading_bot.apps.TradingBotConfig',
-    'videopoker.apps.videopokerConfig',
+    'videopoker.apps.VideopokerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
