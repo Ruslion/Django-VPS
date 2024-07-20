@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,9 +24,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-zk4iob5p+*a2o5a8p)9h@6*l&yu_wmma&7w_ol)r9o%1kn8*3i'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['pychampion.site']
+SECURE_SSL_REDIRECT = False
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# SECURE_HSTS_SECONDS = 3600
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
+
+ALLOWED_HOSTS = ['pychampion.site', 'www.pychampion.site']
 
 
 # Application definition
@@ -75,13 +84,17 @@ WSGI_APPLICATION = 'my_vps_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+POSTGRES_USER = os.environ['POSTGRES_USER']
+POSTGRES_PASSWORD = os.environ['POSTGRES_PASSWORD']
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'HOST': 'localhost',
         'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'pgAdmin48279'
+        'USER': POSTGRES_USER,
+        'PASSWORD': POSTGRES_PASSWORD
     }
 }
 
