@@ -1,3 +1,31 @@
+:root {
+  --base-color:#6A00FA;
+  --second-color:#A9FA00;
+  --third-color:#FAD500;
+  --fourth-color:#573D7A;
+  --fifth-color:#677A3D;
+  --sixth-color: #7A713D;
+}
+table {
+  width:100%;
+  border:3px solid;
+  border-color:var(--fifth-color); 
+  margin:auto; 
+  font-size:medium;
+  color:var(--third-color);
+  text-align: left;
+}
+
+
+h1 {
+  margin:auto;
+  width:fit-content;
+}
+
+.title {
+  width: 100%;
+  
+}
 .hand {
     display:flex;
     width: 100%;
@@ -5,7 +33,7 @@
 .flip-card {
     background-color: transparent;
     width: 18%;
-    height: 255px;
+    height: 140px;
     perspective: 1000px; /* Remove this if you don't want the 3D effect */
     margin: 1%;
   }
@@ -36,8 +64,11 @@
   
   /* Style the front side (fallback if image is missing) */
   .flip-card-front {
-    background-color: #bbb;
+    background-color: var(--third-color);
     color: black;
+    font-size:xx-large;
+    vertical-align: middle;
+    height:100%
   }
   
   /* Style the back side */
@@ -53,15 +84,13 @@
   }
 
   table td + td {
-    border-left:2px solid yellow;
+    border-left:2px solid var(--third-color);
   }
-  tr {
-    background-color: aqua;
-  }
+  
 
-  tr .alternate {
-    background-color: blue;
+  .alternate {
+    background-color: var(--fourth-color);
   }
   body {
-    background-color: blue;
+    background-color: var(--base-color);
   }

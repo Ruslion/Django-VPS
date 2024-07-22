@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments update and context.
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    update.message.reply_text('Hello! This bot and mini app is still in development. Please stay with us. Thank you!')
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    update.message.reply_text('Hello! This bot and mini app is still in development. Please stay with us. Thank you!')
 
 def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
