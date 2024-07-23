@@ -101,6 +101,7 @@ h1 {
     text-align: center;
     transition: transform 0.4s;
     transform-style: preserve-3d;
+    
   }
   
   /* Do an horizontal flip when you move the mouse over the flip box container */
@@ -115,11 +116,12 @@ h1 {
     height: 100%;
     -webkit-backface-visibility: hidden; /* Safari */
     backface-visibility: hidden;
+    border-radius: 10px;
   }
   
   /* Style the front side (fallback if image is missing) */
   .flip-card-front {
-    background-color: var(--third-color);
+    background-color: whitesmoke;
     color: black;
     font-size:x-large;
     vertical-align: middle;
@@ -128,9 +130,12 @@ h1 {
   
   /* Style the back side */
   .flip-card-back {
+    background-image: url('/static/videopoker/card_back_180.jpg');
+    background-size:cover;
+    background-repeat: round;
     color: white;
     transform: rotateY(180deg);
-    border-radius: 20px;
+    
   }
 
   img {
