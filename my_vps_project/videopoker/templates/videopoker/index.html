@@ -14,6 +14,14 @@
 <div class="title"><h1>Jacks or better</h1></div>
 <div class="multiplier_table" >
   <table>
+    <colgroup>
+      <col id="col_0">
+      <col id="col_1">
+      <col id="col_2">
+      <col id="col_3">
+      <col id="col_4">
+      <col id="col_5">
+</colgroup>
     <tr><td>ROYAL FLUSH</td><td>250</td><td>500</td><td>750</td><td>1000</td><td>4000</td></tr>
     <tr class="alternate"><td>STRAIGHT FLUSH</td><td>50</td><td>100</td><td>150</td><td>200</td><td>250</td></tr>
     <tr><td>FOUR OF A KIND</td><td>25</td><td>50</td><td>75</td><td>100</td><td>125</td></tr>
@@ -94,8 +102,25 @@
   </div>
 </div>
 <div class="buttons">
+  <button class="button" role="button" onclick="bet_increase()">Bet</button><button class="button" role="button">Deal</button>
 </div>
-  
+
+
+<script>
+  var bet_multiplier = 1;
+  document.getElementById("col_"+bet_multiplier).classList.add('bet_selected');
+  console.log('print');
+  console.log(document.window.Telegram.WebView.version);
+
+  function bet_increase() {
+    document.getElementById("col_"+bet_multiplier).classList.remove('bet_selected');
+    bet_multiplier = bet_multiplier + 1;
+    if (bet_multiplier > 5) {
+      bet_multiplier = 1; 
+    }
+    document.getElementById("col_"+bet_multiplier).classList.add('bet_selected');
+  }
+</script>
 </body>
 
 </html>
