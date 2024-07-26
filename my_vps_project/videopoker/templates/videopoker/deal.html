@@ -1,0 +1,12 @@
+{% for card in drawn_cards%}
+  <div class="flip-card" >
+    <div class="flip-card-inner" >
+      <div class="flip-card-front" onclick="flip_card(this)">
+        {{card}}
+      </div>
+      <div class="flip-card-back" onclick="flip_card(this)">
+      </div>
+    </div>
+  </div>
+ {% endfor %}
+

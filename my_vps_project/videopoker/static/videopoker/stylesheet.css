@@ -104,8 +104,9 @@ h1 {
     
   }
   
-  /* Do an horizontal flip when you move the mouse over the flip box container */
-  .flip-card:hover .flip-card-inner {
+
+
+  .flip-animation {
     transform: rotateY(180deg);
   }
   
@@ -122,6 +123,8 @@ h1 {
   /* Style the front side (fallback if image is missing) */
   .flip-card-front {
     background-color: whitesmoke;
+    display:grid;
+    align-items: center;
     color: black;
     font-size:x-large;
     vertical-align: middle;

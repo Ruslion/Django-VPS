@@ -1,9 +1,11 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
   
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="{% static 'videopoker/htmx.min.js' %}"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Video poker</title>
@@ -34,60 +36,31 @@
 
   </table>
 </div>
-<div class="hand">
-  <div class="flip-card">
-    <div class="flip-card-inner">
-      <div class="flip-card-front">
-        <p>A♣</p>
+<form>
+  {% csrf_token %}
+<div id='hand' class="hand">
+ {% for card in drawn_cards%}
+  <div class="flip-card" >
+    <div class="flip-card-inner" >
+      <div class="flip-card-front" onclick="flip_card(this)">
+        {{card}}
       </div>
-      <div class="flip-card-back">
-      </div>
-    </div>
-  </div>
-
-  <div class="flip-card">
-    <div class="flip-card-inner">
-      <div class="flip-card-front">
-        <p>K♣</p>
-      </div>
-      <div class="flip-card-back">
+      <div class="flip-card-back" onclick="flip_card(this)">
       </div>
     </div>
   </div>
-
-  <div class="flip-card">
-    <div class="flip-card-inner">
-      <div class="flip-card-front">
-        <p>Q♣</p>
-      </div>
-      <div class="flip-card-back">
-      </div>
-    </div>
-  </div>
-
-  <div class="flip-card">
-    <div class="flip-card-inner">
-      <div class="flip-card-front">
-        <p>J♣</p>
-      </div>
-      <div class="flip-card-back">
-      </div>
-    </div>
-  </div>
-
-  <div class="flip-card">
-    <div class="flip-card-inner">
-      <div class="flip-card-front">
-        <p>10♣</p>
-      </div>
-      <div class="flip-card-back">
-      </div>
-    </div>
-  </div>
+ {% endfor %}
 </div>
+
+
 <div class="buttons">
-  <button class="button" role="button" onclick="bet_increase()">Bet</button><button class="button" role="button">Deal</button>
+  <button type="button" class="button" role="button" onclick="bet_increase()">Bet</button>
+  <button type="button"  class="button" role="button" hx-post="/videopoker/deal/" hx-target="#hand" >Deal</button>
 </div>
+<span>Test</span>
+</form>
+
+
 
 
 <script>
@@ -96,6 +69,15 @@
   console.log('print');
   console.log(document.window.Telegram.WebView.version);
 
+  function flip_card(card_clicked) {
+    if (card_clicked.parentElement.classList.contains("flip-animation")) {
+      card_clicked.parentElement.classList.remove('flip-animation');
+    }
+    else {
+      card_clicked.parentElement.classList.add('flip-animation');
+    }
+
+  }
   function bet_increase() {
     document.getElementById("col_"+bet_multiplier).classList.remove('bet_selected');
     bet_multiplier = bet_multiplier + 1;
