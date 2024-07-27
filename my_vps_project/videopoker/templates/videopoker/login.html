@@ -1,0 +1,16 @@
+{% extends 'videopoker/base.html' %}
+
+{% block content %}
+<div class="login" ><span>Logging in...</span></div>
+<form name="login_form" method="post">{% csrf_token %}
+    <input type="hidden" id="init_data">
+
+</form>
+<script>
+    window.onload = function(){
+        // Getting data from Telegram
+        document.getElementById('init_data').value = window.Telegram.WebApp.initData;
+        // document.forms['login_form'].submit();
+}
+</script>
+{% endblock %}
