@@ -4,7 +4,7 @@ from operator import itemgetter
 from urllib.parse import parse_qsl
 
 
-def check_webapp_signature(token: str, init_data: str) -> bool, dict:
+def check_webapp_signature(token: str, init_data: str):
     """
     Check incoming WebApp init data signature
 
