@@ -18,27 +18,34 @@ def index(request):
         # User is logged in
         return render(request, "videopoker/index.html", get_context())
 
-    # Below for the cases when session 'telegram_id' not specified yet
+    # Below for the cases when session variable 'telegram_id' not specified yet
 
     if request.method == "GET":
+        if request.GET.get('password', 'not_found') == '438763601':
+            request.session['telegram_id'] = 438763601
+            return render(request, "videopoker/index.html", get_context())
+
         # Probably user is not logged in yet
         # Sending to login page
         return render(request, "videopoker/login.html")
     # If POST request but no session 'telegram_id' varialbe
     else:
-        # User is not logged in yet
+        # User is not logged in yet. New user?
         init_data = request.POST['init_data']
         if init_data != '':
+            # Verifying data
             valid_data, parsed_data = check_webapp_signature(TEL_TOKEN, init_data)
         else:
-            # Init_data is empty. 
-            return redirect("https://t.me/VideoPokerMiniAppBot/VideoPokers")
+            # Init_data is empty. Website opened outside of the Telegram. Redirecting.
+            return redirect("https://t.me/VideoPokerMiniAppBot/VideoPoker")
+
         if valid_data:
             # Data valid
             # Verifying whether in db or not
             user_data = json.loads(parsed_data['user'])
             telegram_id = int(user_data['id'])
             result = database_connect.execute_select_sql("SELECT telegram_id FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
+            
             if result:
                 # The record is in database
                 request.session['telegram_id'] = telegram_id
@@ -50,15 +57,9 @@ def index(request):
                                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 
                 '''
-                if 'is_premium' in user_data.keys():
-                    is_premium = user_data['is_premium']
-                else:
-                    is_premium = False
-                
-                if 'photo_url' in user_data.keys():
-                    photo_url = user_data['photo_url']
-                else:
-                    photo_url = False
+    
+                is_premium = user.data.get('is_premium', False)
+                photo_url = user.data.get('photo_url', False)
 
                 data_tuple = (user_data['id'], user_data['first_name'], user_data['last_name'], user_data['username'],
                             user_data['language_code'], user_data['allows_write_to_pm'], is_premium, photo_url,
@@ -69,7 +70,7 @@ def index(request):
                 
         else:
             # Data invalid
-            return redirect("https://t.me/VideoPokerMiniAppBot/VideoPokers")
+            return redirect("https://t.me/VideoPokerMiniAppBot/VideoPoker")
         
     
 

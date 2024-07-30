@@ -1,8 +1,10 @@
 {% extends 'videopoker/base.html' %}
 
 {% block content %}
-<div class="title"><h2>Jacks or better</h2></div>
-<div class="multiplier_table" >
+<div class="title">
+  <h2>Jacks or better</h2>
+</div>
+<div class="multiplier_table">
   <table>
     <colgroup>
       <col id="col_0">
@@ -11,69 +13,189 @@
       <col id="col_3">
       <col id="col_4">
       <col id="col_5">
-</colgroup>
-    <tr><td>ROYAL FLUSH</td><td>250</td><td>500</td><td>750</td><td>1000</td><td>4000</td></tr>
-    <tr class="alternate"><td>STRAIGHT FLUSH</td><td>50</td><td>100</td><td>150</td><td>200</td><td>250</td></tr>
-    <tr><td>FOUR OF A KIND</td><td>25</td><td>50</td><td>75</td><td>100</td><td>125</td></tr>
-    <tr class="alternate"><td>FULL HOUSE</td><td>9</td><td>18</td><td>27</td><td>36</td><td>45</td></tr>
-    <tr><td>FLUSH</td><td>6</td><td>12</td><td>18</td><td>24</td><td>30</td></tr>
-    <tr class="alternate"><td>STRAIGHT</td><td>4</td><td>8</td><td>12</td><td>16</td><td>20</td></tr>
-    <tr><td>THREE OF A KIND</td><td>3</td><td>6</td><td>9</td><td>12</td><td>15</td></tr>
-    <tr class="alternate"><td>TWO PAIR</td><td>2</td><td>4</td><td>6</td><td>8</td><td>10</td></tr>
-    <tr><td>JACKS OR BETTER</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+    </colgroup>
+    <tr>
+      <td>ROYAL FLUSH</td>
+      <td>250</td>
+      <td>500</td>
+      <td>750</td>
+      <td>1000</td>
+      <td>4000</td>
+    </tr>
+    <tr class="alternate">
+      <td>STRAIGHT FLUSH</td>
+      <td>50</td>
+      <td>100</td>
+      <td>150</td>
+      <td>200</td>
+      <td>250</td>
+    </tr>
+    <tr>
+      <td>FOUR OF A KIND</td>
+      <td>25</td>
+      <td>50</td>
+      <td>75</td>
+      <td>100</td>
+      <td>125</td>
+    </tr>
+    <tr class="alternate">
+      <td>FULL HOUSE</td>
+      <td>9</td>
+      <td>18</td>
+      <td>27</td>
+      <td>36</td>
+      <td>45</td>
+    </tr>
+    <tr>
+      <td>FLUSH</td>
+      <td>6</td>
+      <td>12</td>
+      <td>18</td>
+      <td>24</td>
+      <td>30</td>
+    </tr>
+    <tr class="alternate">
+      <td>STRAIGHT</td>
+      <td>4</td>
+      <td>8</td>
+      <td>12</td>
+      <td>16</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <td>THREE OF A KIND</td>
+      <td>3</td>
+      <td>6</td>
+      <td>9</td>
+      <td>12</td>
+      <td>15</td>
+    </tr>
+    <tr class="alternate">
+      <td>TWO PAIR</td>
+      <td>2</td>
+      <td>4</td>
+      <td>6</td>
+      <td>8</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td>JACKS OR BETTER</td>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+    </tr>
 
   </table>
 </div>
 <form>
   {% csrf_token %}
-<div id='hand' class="hand">
- {% for card in drawn_cards%}
-  <div class="flip-card" >
-    <div class="flip-card-inner" >
-      <div class="flip-card-front" onclick="flip_card(this)">
-        {{card}}
-      </div>
-      <div class="flip-card-back" onclick="flip_card(this)">
+  
+  <div class="held">
+    <div class="held-caption" ><span id="held_1">Held</span></div>
+    <div class="held-caption" ><span id="held_2">Held</span></div>
+    <div class="held-caption" ><span id="held_3">Held</span></div>
+    <div class="held-caption" ><span id="held_4">Held</span></div>
+    <div class="held-caption" ><span id="held_5">Held</span></div>
+  </div>
+  <div id='hand' class="hand">
+    {% for card in drawn_cards%}
+    <div class="flip-card">
+      <div id="card_{{ forloop.counter }}" class="flip-card-inner">
+        <div class="flip-card-front" onclick="hold_card(this)">
+          {{card}}
+        </div>
+        <div class="flip-card-back">
+        </div>
       </div>
     </div>
+    {% endfor %}
   </div>
- {% endfor %}
-</div>
 
 
-<div class="buttons">
-  <button type="button" class="button" role="button" onclick="bet_increase()">Bet</button>
-  <button type="button"  class="button" role="button" hx-post="/videopoker/deal/" hx-target="#hand" >Deal</button>
-</div>
-
+  <div class="buttons">
+    <button name="bet_button" type="button" class="button" role="button" onclick="bet_increase()">Bet</button>
+    <button type="button" class="button" role="button" hx-post="/videopoker/deal/" hx-target="#hand">Deal</button>
+  </div>
+  <input type="hidden" name="bet_mult" id="bet_m" value=1>
 </form>
 
 
 
 
 <script>
-  var bet_multiplier = 1;
-  document.getElementById("col_"+bet_multiplier).classList.add('bet_selected');
-  console.log('print');
-  console.log(document.window.Telegram.WebView.version);
+  // Start coloring cards when loaded.
+  document.body.addEventListener('htmx:afterSettle', function (evt) {
+    
+    var elements = document.querySelectorAll('.flip-card-front');
 
-  function flip_card(card_clicked) {
-    if (card_clicked.parentElement.classList.contains("flip-animation")) {
-      card_clicked.parentElement.classList.remove('flip-animation');
+    // Iterate over the NodeList using forEach
+    elements.forEach(function (element) {
+      var card = element.innerHTML;
+      let newStr = card.replace("T", "10");
+      element.innerHTML = newStr;
+      var symbol = "♦";
+      var index = card.indexOf(symbol);
+      if (index !== -1) {
+        element.style.color = 'red';
+        return;
+      }
+
+      var symbol = "♥";
+      var index = card.indexOf(symbol);
+      if (index !== -1) {
+        element.style.color = 'red';
+      }
+
+    });
+  });
+
+  //Flipping cards before the draw and return to normal place after the hold animation.
+  document.body.addEventListener('htmx:beforeRequest', function (evt) {
+
+
+  });
+
+
+  const event = new Event('htmx:afterSettle');
+
+  // Dispatching event at initial load.
+  document.body.dispatchEvent(event);
+
+
+  var bet_multiplier = 1;
+  document.getElementById("col_" + bet_multiplier).classList.add('bet_selected');
+
+  window.onload = function () {
+    // Your code here
+    for (let i = 1; i <= 5; i++) {
+      document.getElementById("card_" + i).classList.add('flip-animation');
+    }
+  };
+
+  function hold_card(card_clicked) {
+    var grandParent = card_clicked.parentElement.parentElement;
+     if (grandParent.classList.contains("hold_animation")) {
+      grandParent.classList.remove('hold_animation');
     }
     else {
-      card_clicked.parentElement.classList.add('flip-animation');
+      grandParent.classList.add('hold_animation');
     }
-
   }
+
+  
+  
   function bet_increase() {
-    document.getElementById("col_"+bet_multiplier).classList.remove('bet_selected');
+    document.getElementById("col_" + bet_multiplier).classList.remove('bet_selected');
     bet_multiplier = bet_multiplier + 1;
     if (bet_multiplier > 5) {
-      bet_multiplier = 1; 
+      bet_multiplier = 1;
     }
-    document.getElementById("col_"+bet_multiplier).classList.add('bet_selected');
+    document.getElementById("col_" + bet_multiplier).classList.add('bet_selected');
+    document.getElementById("bet_m").value = bet_multiplier;
   }
+
+
 </script>
 {% endblock %}
-
