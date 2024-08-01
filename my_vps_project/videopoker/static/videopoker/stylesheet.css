@@ -36,8 +36,8 @@ span {
 }
 
 .hold_animation {
-  transform: translateY(-5px);
-  transition: transform 0.3s;
+  transform: scale(0.98);
+  transition: transform 0.2s ease-out;
 
 }
 
@@ -121,7 +121,7 @@ div.buttons {
   margin: 1%;
   display:flex;
   color: var(--third-color);
-  /* visibility: hidden; */
+  visibility:hidden;
 }
 .flip-card {
     background-color: transparent;
@@ -177,8 +177,6 @@ div.buttons {
     background-size:cover;
     background-repeat: round;
     color: white;
-    
-    
   }
 
   .alternate {

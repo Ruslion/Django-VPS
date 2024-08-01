@@ -1,12 +1,13 @@
 {% for card in drawn_cards%}
   <div class="flip-card" >
     <div id="card_{{ forloop.counter }}" class="flip-card-inner flip-animation" >
-      <div class="flip-card-front" onclick="hold_card(this)">
+      <div class="flip-card-front" onclick="hold_card(this, {{forloop.counter}})">
         {{card}}
       </div>
       <div class="flip-card-back">
       </div>
     </div>
   </div>
+  <input type="hidden" name="hidden_card_[]" id="hidden_card_{{forloop.counter}}" value={{card}}>
  {% endfor %}
 
