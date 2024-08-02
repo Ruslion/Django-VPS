@@ -104,7 +104,7 @@
     <div class="flip-card">
       <div id="card_{{ forloop.counter }}" class="flip-card-inner">
         <div class="flip-card-front" onclick="hold_card(this, {{forloop.counter}})">
-          {{card}}
+          
         </div>
         <div class="flip-card-back">
         </div>
@@ -114,12 +114,13 @@
     {% endfor %}
   </div>
 
-
+  <div class="balance"><span>Balance: {{Balance}}</span>
+  </div>
   <div class="buttons">
     <button name="bet_button" type="button" class="button" role="button" onclick="bet_increase()">Bet</button>
     <button type="button" class="button" role="button" hx-post="/videopoker/deal/" hx-target="#hand">Deal</button>
   </div>
-  <input type="hidden" name="bet_mult" id="bet_m" value=1>
+  <input type="hidden" name="bet_m" id="bet_m" value=1>
 </form>
 
 
@@ -168,12 +169,12 @@
   var bet_multiplier = 1;
   document.getElementById("col_" + bet_multiplier).classList.add('bet_selected');
 
-  window.onload = function () {
-    // Your code here
-    for (let i = 1; i <= 5; i++) {
-      document.getElementById("card_" + i).classList.add('flip-animation');
-    }
-  };
+  // window.onload = function () {
+  //   // Your code here
+  //   for (let i = 1; i <= 5; i++) {
+  //     document.getElementById("card_" + i).classList.add('flip-animation');
+  //   }
+  // };
 
   function hold_card(card_clicked, id) {
     var grandParent = card_clicked.parentElement.parentElement;

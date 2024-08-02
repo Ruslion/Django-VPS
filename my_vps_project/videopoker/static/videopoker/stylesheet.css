@@ -57,7 +57,7 @@ span {
 
 }
 
-div.buttons {
+div.buttons, div.balance {
   width: 100%;
   display: flex;
 }

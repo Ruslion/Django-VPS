@@ -31,7 +31,7 @@ def execute_select_sql(query, params, config=CONFIG):
     
     return result
 
-def execute_insert_sql(query, params, config=CONFIG):
+def execute_insert_update_sql(query, params, config=CONFIG):
     conn = connect(config)
     
     try:

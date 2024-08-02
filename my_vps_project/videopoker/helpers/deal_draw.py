@@ -7,7 +7,7 @@ def deal_cards():
             'Q♦', 'Q♣', 'K♠', 'K♥', 'K♦', 'K♣', 'A♠', 'A♥', 'A♦', 'A♣']
     
     random.shuffle(deck)
-    return deck[:5]
+    return deck[:5], deck[5:10]
 
 def evaluate_hand(hand):
     combinations = ['Royal Flush', 'Straight Flush', 'Four of a Kind', 'Full House',
