@@ -14,7 +14,6 @@ def connect(config):
         # connecting to the PostgreSQL server
         with psycopg2.connect(**config) as conn:
             # Successfully connected
-            # print('Connected to the PostgreSQL server.')
             return conn
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
@@ -36,8 +35,10 @@ def execute_insert_update_sql(query, params, config=CONFIG):
     
     try:
         with conn.cursor() as cursor:
-            result = cursor.execute(query, params)
+            cursor.execute(query, params)
+            result = cursor.fetchone()
         conn.commit()
+
     finally:
         conn.close()
     

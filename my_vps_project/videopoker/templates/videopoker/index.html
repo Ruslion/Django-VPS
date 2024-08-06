@@ -91,36 +91,40 @@
 </div>
 <form>
   {% csrf_token %}
-  
+<div id="table">
   <div class="held">
-    <div class="held-caption" id="held_1"><span >Held</span></div>
+    <div class="held-caption" id="held_0"><span >Held</span></div>
+    <div class="held-caption" id="held_1"><span>Held</span></div>
     <div class="held-caption" id="held_2"><span>Held</span></div>
     <div class="held-caption" id="held_3"><span>Held</span></div>
     <div class="held-caption" id="held_4"><span>Held</span></div>
-    <div class="held-caption" id="held_5"><span>Held</span></div>
   </div>
   <div id='hand' class="hand">
     {% for card in drawn_cards%}
     <div class="flip-card">
-      <div id="card_{{ forloop.counter }}" class="flip-card-inner">
-        <div class="flip-card-front" onclick="hold_card(this, {{forloop.counter}})">
-          
+      <div id="card_{{ forloop.counter0 }}" class="flip-card-inner">
+        <div class="flip-card-front" onclick="hold_card(this, {{forloop.counter0}})">
         </div>
         <div class="flip-card-back">
         </div>
       </div>
     </div>
-    <input type="hidden" name="hidden_card_[]" id="hidden_card_{{forloop.counter}}" value={{card}}>
+    
     {% endfor %}
-  </div>
 
-  <div class="balance"><span>Balance: {{Balance}}</span>
+    <input type="hidden" name="held" id="held" value="0">
+    
   </div>
+    <div class="balance"><span>Balance: {{balance}} chips</span>
+
+    </div>
+</div>
+  
   <div class="buttons">
     <button name="bet_button" type="button" class="button" role="button" onclick="bet_increase()">Bet</button>
-    <button type="button" class="button" role="button" hx-post="/videopoker/deal/" hx-target="#hand">Deal</button>
+    <button type="button" class="button" role="button" hx-post="/videopoker/deal/" hx-target="#table">Deal</button>
   </div>
-  <input type="hidden" name="bet_m" id="bet_m" value=1>
+  <input type="hidden" name="bet_m" id="bet_m" value="1">
 </form>
 
 
@@ -155,15 +159,26 @@
 
   //Flipping cards before the draw and return to normal place after the hold animation.
   document.body.addEventListener('htmx:beforeRequest', function (evt) {
+    var held_cards_value = parseInt(document.getElementById("held").value);
+    const values = [16, 8, 4, 2, 1];
 
+    for (let index = 0; index < values.length; index++) {
+      if (held_cards_value >= values[index]) {
+        held_cards_value = held_cards_value - values[index];
+      } else {
 
+        document.getElementById("card_" + index).classList.remove('flip-animation');
+      }
+      
+    }
+    
   });
 
 
-  const event = new Event('htmx:afterSettle');
+  // const event = new Event('htmx:afterSettle');
 
   // Dispatching event at initial load.
-  document.body.dispatchEvent(event);
+  // document.body.dispatchEvent(event);
 
 
   var bet_multiplier = 1;
@@ -177,14 +192,17 @@
   // };
 
   function hold_card(card_clicked, id) {
+    var values = [16, 8, 4, 2, 1];
     var grandParent = card_clicked.parentElement.parentElement;
      if (grandParent.classList.contains("hold_animation")) {
       grandParent.classList.remove('hold_animation');
       document.getElementById("held_" + id).style='';
+      document.getElementById("held").value = parseInt(document.getElementById("held").value) - values[id];
     }
     else {
       grandParent.classList.add('hold_animation');
       document.getElementById("held_" + id).style='visibility:visible';
+      document.getElementById("held").value = parseInt(document.getElementById("held").value) + values[id];
     }
 
     

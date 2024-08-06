@@ -1,13 +1,26 @@
+<div class="held">
+  <div class="held-caption" id="held_0"><span >Held</span></div>
+  <div class="held-caption" id="held_1"><span>Held</span></div>
+  <div class="held-caption" id="held_2"><span>Held</span></div>
+  <div class="held-caption" id="held_3"><span>Held</span></div>
+  <div class="held-caption" id="held_4"><span>Held</span></div>
+</div>
+<div id='hand' class="hand">
 {% for card in drawn_cards%}
   <div class="flip-card" >
-    <div id="card_{{ forloop.counter }}" class="flip-card-inner flip-animation" >
-      <div class="flip-card-front" onclick="hold_card(this, {{forloop.counter}})">
+    <div id="card_{{ forloop.counter0 }}" class="flip-card-inner flip-animation" >
+      <div class="flip-card-front" onclick="hold_card(this, {{forloop.counter0}})">
         {{card}}
       </div>
       <div class="flip-card-back">
       </div>
     </div>
   </div>
-  <input type="hidden" name="hidden_card_[]" id="hidden_card_{{forloop.counter}}" value={{card}}>
+
  {% endfor %}
+ <input type="hidden" name="held" id="held" value="0">
+</div>
+<div class="balance"><span>Balance: {{balance}} chips</span>
+
+</div>
 
