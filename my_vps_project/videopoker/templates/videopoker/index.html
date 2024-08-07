@@ -141,18 +141,6 @@
       var card = element.innerHTML;
       let newStr = card.replace("T", "10");
       element.innerHTML = newStr;
-      var symbol = "♦";
-      var index = card.indexOf(symbol);
-      if (index !== -1) {
-        element.style.color = 'red';
-        return;
-      }
-
-      var symbol = "♥";
-      var index = card.indexOf(symbol);
-      if (index !== -1) {
-        element.style.color = 'red';
-      }
 
     });
   });

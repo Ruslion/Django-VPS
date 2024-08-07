@@ -194,3 +194,7 @@ div.buttons, div.balance {
   .alternate {
     background-color: var(--fourth-color);
   }
+
+  .red {
+    color:red;
+  }

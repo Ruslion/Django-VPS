@@ -6,10 +6,10 @@
   <div class="held-caption" id="held_4"><span>Held</span></div>
 </div>
 <div id='hand' class="hand">
-{% for card in drawn_cards%}
+{% for card, color in drawn_cards%}
   <div class="flip-card" >
     <div id="card_{{ forloop.counter0 }}" class="flip-card-inner flip-animation" >
-      <div class="flip-card-front" onclick="hold_card(this, {{forloop.counter0}})">
+      <div class="flip-card-front {{color}}" onclick="hold_card(this, {{forloop.counter0}})">
         {{card}}
       </div>
       <div class="flip-card-back">

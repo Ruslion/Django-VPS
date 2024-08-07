@@ -9,17 +9,34 @@ TEL_TOKEN = os.environ['TEL_TOKEN']
 INITIAL_CHIPS_AMOUNT = 5000
 BET_FACTOR = 100
 EMPTY_CONTEXT = {'drawn_cards': [1, 2, 3, 4, 5]}
-CLOWN_CONTEXT = {'drawn_cards': ['&#129313;','&#129313;', '&#129313;', '&#129313;', '&#129313;']}
+CLOWN_CONTEXT = {'drawn_cards': [[u"\U0001F921", ''], # Clown face emoji
+                                [u"\U0001F921", ''],
+                                [u"\U0001F921", ''],
+                                [u"\U0001F921", ''],
+                                [u"\U0001F921", '']
+                                ]}
 HELD_VALUES = [16, 8, 4, 2, 1]
 
 def get_context(current_bet, telegram_id):
     drawn_cards, extra_cards = deal_draw.deal_cards()
-    context = {'drawn_cards': drawn_cards, 'extra_cards':extra_cards}
+    context = {'drawn_cards':[], 'extra_cards':extra_cards}
+    
+    for card in drawn_cards:
+        card_and_color = []
+        card_and_color.append(card)
+        if card[1] in [ '♥', '♦']:
+            card_and_color.append('red')
+        else:
+            card_and_color.append('')
+        context['drawn_cards'].append(card_and_color) # drawn_cards list will have two variables: card itself and its color.
+
     balance_update_sql = '''UPDATE videopoker_users SET balance = balance - %s WHERE telegram_id = %s RETURNING balance;'''
     result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (current_bet, telegram_id))
     if result_balance:
         context['balance'] = result_balance[0]
+
     return context
+
 
 
 def index(request):
@@ -103,16 +120,28 @@ def deal(request):
             # Cards are dealt and now needs to be drawn. Cards verifiction below.
             held = int(request.POST.get('held'))
             new_hand_of_cards = []
+            cards_to_evaluate = []
+            context = {}
             for index, value in enumerate(HELD_VALUES):
                 if held >= value:
                     # This index card is held
                     held-=value
                     new_hand_of_cards.append(request.session['drawn_cards'][index])
+                    cards_to_evaluate.append(request.session['drawn_cards'][index][0])
+                    
                 else:
                     # This index card is not held
-                    new_hand_of_cards.append(request.session['extra_cards'][index])
-            context = {'drawn_cards':new_hand_of_cards}
-            value_of_new_hand = deal_draw.evaluate_hand(new_hand_of_cards)
+                    card = request.session['extra_cards'][index]
+                    cards_to_evaluate.append(request.session['extra_cards'][index])
+
+                    if card[1] in ['♥', '♦']:
+                        new_hand_of_cards.append([card, 'red'])
+                    else:
+                        new_hand_of_cards.append([card, ''])
+
+
+            context['drawn_cards'] = new_hand_of_cards
+            value_of_new_hand = deal_draw.evaluate_hand(cards_to_evaluate)
 
 
             return render(request, "videopoker/deal.html", context)
@@ -140,9 +169,7 @@ def deal(request):
                 return render(request, "videopoker/deal.html", context)
 
     if request.method == "GET": # Returning NO ACCESS list of string if accessed via GET method.
-        drawn_cards = [c for c in 'NO ACCESS']
-        context = {'drawn_cards': drawn_cards}
-        return render(request, "videopoker/deal.html", context)
+        return render(request, "videopoker/deal.html", CLOWN_CONTEXT)
     
     
     
