@@ -5,6 +5,7 @@ from .helpers import database_connect
 import os
 import json
 
+
 TEL_TOKEN = os.environ['TEL_TOKEN']
 INITIAL_CHIPS_AMOUNT = 5000
 BET_FACTOR = 100
@@ -16,6 +17,8 @@ CLOWN_CONTEXT = {'drawn_cards': [[u"\U0001F921", ''], # Clown face emoji
                                 [u"\U0001F921", '']
                                 ]}
 HELD_VALUES = [16, 8, 4, 2, 1]
+
+COMBINATIONS = {''}
 
 def get_context(current_bet, telegram_id):
     drawn_cards, extra_cards = deal_draw.deal_cards()
@@ -36,7 +39,6 @@ def get_context(current_bet, telegram_id):
         context['balance'] = result_balance[0]
 
     return context
-
 
 
 def index(request):
@@ -132,7 +134,7 @@ def deal(request):
                 else:
                     # This index card is not held
                     card = request.session['extra_cards'][index]
-                    cards_to_evaluate.append(request.session['extra_cards'][index])
+                    cards_to_evaluate.append(card)
 
                     if card[1] in ['♥', '♦']:
                         new_hand_of_cards.append([card, 'red'])
@@ -141,6 +143,11 @@ def deal(request):
 
 
             context['drawn_cards'] = new_hand_of_cards
+
+            for card_list in context['drawn_cards']:
+                if 'T' in card_list[0]:
+                    card_list[0] = '10' + card_list[0][1:]
+
             value_of_new_hand = deal_draw.evaluate_hand(cards_to_evaluate)
 
 
@@ -163,9 +170,15 @@ def deal(request):
                 result_balance_update = database_connect.execute_insert_update_sql(balance_update_sql, (current_bet, telegram_id,))
                 # Balance is not enough to place a bet.
             else:
-                request.session['drawn_cards'] = context['drawn_cards']
+                request.session['drawn_cards'] = [x[:] for x in context['drawn_cards']] # to create deep copy list
                 request.session['extra_cards'] = context['extra_cards']
                 request.session['dealt'] = True
+                
+                for card_list in context['drawn_cards']:
+                    if 'T' in card_list[0]:
+                        card_list[0] = '10' + card_list[0][1:]
+
+                
                 return render(request, "videopoker/deal.html", context)
 
     if request.method == "GET": # Returning NO ACCESS list of string if accessed via GET method.

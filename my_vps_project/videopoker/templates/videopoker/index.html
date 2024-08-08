@@ -134,15 +134,7 @@
   // Start coloring cards when loaded.
   document.body.addEventListener('htmx:afterSettle', function (evt) {
     
-    var elements = document.querySelectorAll('.flip-card-front');
-
-    // Iterate over the NodeList using forEach
-    elements.forEach(function (element) {
-      var card = element.innerHTML;
-      let newStr = card.replace("T", "10");
-      element.innerHTML = newStr;
-
-    });
+    
   });
 
   //Flipping cards before the draw and return to normal place after the hold animation.
@@ -192,12 +184,8 @@
       document.getElementById("held_" + id).style='visibility:visible';
       document.getElementById("held").value = parseInt(document.getElementById("held").value) + values[id];
     }
-
-    
   }
 
-  
-  
   function bet_increase() {
     document.getElementById("col_" + bet_multiplier).classList.remove('bet_selected');
     bet_multiplier = bet_multiplier + 1;
@@ -207,7 +195,6 @@
     document.getElementById("col_" + bet_multiplier).classList.add('bet_selected');
     document.getElementById("bet_m").value = bet_multiplier;
   }
-
 
 </script>
 {% endblock %}

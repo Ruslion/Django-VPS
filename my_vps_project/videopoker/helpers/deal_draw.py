@@ -76,7 +76,7 @@ def evaluate_hand(hand):
             else:
                 tmp_rank = {'T': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}.get(rank)
                 straight_list.append(tmp_rank)
-                
+        
         straight_list = sorted(straight_list)
         
         if straight_list[0] + 4 == straight_list[-1]:
