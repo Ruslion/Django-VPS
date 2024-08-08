@@ -10,8 +10,6 @@ def deal_cards():
     return deck[:5], deck[5:10]
 
 def evaluate_hand(hand):
-    combinations = ['Royal Flush', 'Straight Flush', 'Four of a Kind', 'Full House',
-                   'Flush', 'Straight', 'Three of a Kind', 'Two pairs', 'Jacks or Better']
     suits = []
     ranks = []
     flush = False
@@ -49,8 +47,8 @@ def evaluate_hand(hand):
             return 'Four of a Kind'
     
     if pairs == 1 and not three_of_kind:
-        if pairs_ranks[0] in 'JQKA':
-            return 'Jacks or Better'
+        if pairs_ranks[0] in '89TJQKA':
+            return 'Eights or Better'
         else:
             return 'No_value'
 

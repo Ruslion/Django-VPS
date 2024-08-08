@@ -18,7 +18,8 @@ CLOWN_CONTEXT = {'drawn_cards': [[u"\U0001F921", ''], # Clown face emoji
                                 ]}
 HELD_VALUES = [16, 8, 4, 2, 1]
 
-COMBINATIONS = {''}
+COMBINATIONS = {'Royal Flush', 'Straight Flush', 'Four of a Kind', 'Full House',
+                   'Flush', 'Straight', 'Three of a Kind', 'Two pairs', 'Eights or Better','No_value'}
 
 def get_context(current_bet, telegram_id):
     drawn_cards, extra_cards = deal_draw.deal_cards()
