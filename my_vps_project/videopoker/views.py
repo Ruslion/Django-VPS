@@ -23,6 +23,7 @@ COMBINATIONS = {'Royal Flush', 'Straight Flush', 'Four of a Kind', 'Full House',
 
 def get_context(current_bet, telegram_id):
     drawn_cards, extra_cards = deal_draw.deal_cards()
+    value_of_new_hand = deal_draw.evaluate_hand(drawn_cards)
     context = {'drawn_cards':[], 'extra_cards':extra_cards}
     
     for card in drawn_cards:
