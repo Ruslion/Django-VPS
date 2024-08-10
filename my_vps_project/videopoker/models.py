@@ -18,6 +18,7 @@ class Hands_dealt(models.Model):
     initial_hand = models.CharField(max_length=10)
     extra_cards = models.CharField(max_length=10)
     final = models.CharField(max_length=10, blank=True)
+    win_amount = models.PositiveIntegerField(default=0)
     final_comb = models.ForeignKey("Combinations", on_delete=models.CASCADE, default=1)
 
 class Combinations(models.Model):

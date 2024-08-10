@@ -4,6 +4,7 @@ from .helpers.init_data_verification import check_webapp_signature
 from .helpers import database_connect
 import os
 import json
+from datetime import datetime
 
 
 TEL_TOKEN = os.environ['TEL_TOKEN']
@@ -53,25 +54,16 @@ def index(request):
     # Regardless of the options 'dealt' key is equals to False
     request.session['dealt'] = False
 
-    # Verifying session is active
-    if 'telegram_id' in request.session:
-        # User is logged in. Empty context with balance.
-        telegram_id = request.session['telegram_id']
-        result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s",
-                                    (telegram_id,))
-        EMPTY_CONTEXT['balance'] = result_balance[0][0]
-        request.session['balance'] = result_balance[0][0]
-        return render(request, "videopoker/index.html", EMPTY_CONTEXT)
-
     # Below for the cases when session variable 'telegram_id' not specified yet
     if request.method == "GET":
         # Access for myself
         if request.GET.get('password', 'not_found') == '438763601':
             request.session['telegram_id'] = 438763601
             telegram_id = 438763601
-            result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
+            result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
             EMPTY_CONTEXT['balance'] = result_balance[0][0]
             request.session['balance'] = result_balance[0][0]
+            request.session['user_id'] = result_balance[0][1]
             return render(request, "videopoker/index.html", EMPTY_CONTEXT)
 
         # Probably user is not logged in yet
@@ -93,13 +85,14 @@ def index(request):
             # Verifying whether in db or not
             user_data = json.loads(parsed_data['user'])
             telegram_id = int(user_data['id'])
-            result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
+            result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
             
             if result_balance:
                 # The record is in database
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
                 request.session['balance'] = result_balance[0][0]
+                request.session['user_id'] = result_balance[0][1]
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
             else:
                 # The record is not in database yet. Creating new record.
@@ -118,6 +111,7 @@ def index(request):
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance']  = INITIAL_CHIPS_AMOUNT
                 request.session['balance'] = INITIAL_CHIPS_AMOUNT
+                request.session['user_id'] = result[0]
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
                 
         else:
@@ -140,7 +134,7 @@ def deal(request):
                 if held >= value:
                     # This index card is held
                     held-=value
-                    new_hand_of_cards.append(request.session['drawn_cards'][index])
+                    new_hand_of_cards.append([card[:] for card in request.session['drawn_cards'][index]]) # creating deep copy to avoid convering Ts to 10s.
                     cards_to_evaluate.append(request.session['drawn_cards'][index][0])
                     
                 else:
@@ -178,14 +172,25 @@ def deal(request):
                     request.session['balance'] = context['balance']
             else:
                 # The hand is not winning. Need to return previous value of the balance.
+                winning_value = 0
                 context['balance'] = request.session['balance']
 
 
             # Saving hand into database.
             saving_hand_sql = '''INSERT INTO videopoker_Hands_dealt (user_id_id, date_time, bet_multiplier, initial_hand,
-            extra_cards, final, final_comb_id)
-            VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;
+            extra_cards, final, win_amount, final_comb_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;
             '''
+            
+
+            insert_tuple = (request.session['user_id'], datetime.now(), int(request.session['bet_m']), 
+                            ''.join([card_list[0] for card_list in request.session['drawn_cards']]), # Initial cards
+                            ''.join(request.session['extra_cards']), # extra cards
+                            ''.join(cards_to_evaluate), # final cards
+                            winning_value,
+                            context['combination'])
+            result_insert_hand = database_connect.execute_insert_update_sql(saving_hand_sql, insert_tuple)
+            
             return render(request, "videopoker/deal.html", context)
         else:
             # New hand is dealt.
@@ -209,13 +214,14 @@ def deal(request):
                 # Balance is not enough to place a bet.
             else:
                 request.session['drawn_cards'] = [x[:] for x in context['drawn_cards']] # to create deep copy list
+                
                 request.session['extra_cards'] = context['extra_cards']
                 request.session['dealt'] = True
                 request.session['balance'] = context['balance']
                 for card_list in context['drawn_cards']:
                     if 'T' in card_list[0]:
                         card_list[0] = '10' + card_list[0][1:]
-
+                
                 
                 return render(request, "videopoker/deal.html", context)
 
