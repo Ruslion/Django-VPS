@@ -36,7 +36,8 @@ def execute_insert_update_sql(query, params, config=CONFIG):
     try:
         with conn.cursor() as cursor:
             cursor.execute(query, params)
-            result = cursor.fetchone()
+            if cursor:
+                result = cursor.fetchone()
         conn.commit()
 
     finally:

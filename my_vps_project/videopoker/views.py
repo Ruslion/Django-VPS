@@ -7,32 +7,37 @@ import json
 
 
 TEL_TOKEN = os.environ['TEL_TOKEN']
-INITIAL_CHIPS_AMOUNT = 5000
-BET_FACTOR = 100
-EMPTY_CONTEXT = {'drawn_cards': [1, 2, 3, 4, 5]}
-CLOWN_CONTEXT = {'drawn_cards': [[u"\U0001F921", ''], # Clown face emoji
+INITIAL_CHIPS_AMOUNT = 5000 # The amount given at registration.
+BET_MIN = 100 # The minimum amount of chips bet.
+EMPTY_CONTEXT = {'drawn_cards': [1, 2, 3, 4, 5]} # Empty context is used as placeholder for the first call of the index page.
+CLOWN_CONTEXT = {'drawn_cards': [[u"\U0001F921", ''], # Clown face emoji. This context is used when someone messes with the client's post form.
                                 [u"\U0001F921", ''],
                                 [u"\U0001F921", ''],
                                 [u"\U0001F921", ''],
                                 [u"\U0001F921", '']
                                 ]}
-HELD_VALUES = [16, 8, 4, 2, 1]
+HELD_VALUES = [16, 8, 4, 2, 1] # Held values are used to encode/decode the held cards from client's side.
 
-COMBINATIONS = {'Royal Flush', 'Straight Flush', 'Four of a Kind', 'Full House',
-                   'Flush', 'Straight', 'Three of a Kind', 'Two pairs', 'Eights or Better','No_value'}
+# Combinations IDs as in database.
+COMBINATIONS_ID = {'Royal Flush':10, 'Straight Flush':9, 'Four of a Kind':8, 'Full House':7,
+                   'Flush':6, 'Straight':5, 'Three of a Kind':4, 'Two pairs':3, 'Eights or Better':2,'No value':1}
+# Combinations winning factor
+COMBINATIONS_FACTOR = {'Royal Flush':250, 'Straight Flush':50, 'Four of a Kind':25, 'Full House':9,
+                   'Flush':6, 'Straight':4, 'Three of a Kind':3, 'Two pairs':2, 'Eights or Better':1,'No value':0}
 
+# Help function. Not view. This function prepares context for the new hand dealt.
 def get_context(current_bet, telegram_id):
     drawn_cards, extra_cards = deal_draw.deal_cards()
     value_of_new_hand = deal_draw.evaluate_hand(drawn_cards)
     context = {'drawn_cards':[], 'extra_cards':extra_cards}
-    
+    context['combination'] = COMBINATIONS_ID[value_of_new_hand]
     for card in drawn_cards:
         card_and_color = []
         card_and_color.append(card)
         if card[1] in [ '♥', '♦']:
             card_and_color.append('red')
         else:
-            card_and_color.append('')
+            card_and_color.append('') # Black font color is default thus empty string is sufficient.
         context['drawn_cards'].append(card_and_color) # drawn_cards list will have two variables: card itself and its color.
 
     balance_update_sql = '''UPDATE videopoker_users SET balance = balance - %s WHERE telegram_id = %s RETURNING balance;'''
@@ -42,7 +47,7 @@ def get_context(current_bet, telegram_id):
 
     return context
 
-
+# This view is used for initial application download.
 def index(request):
 
     # Regardless of the options 'dealt' key is equals to False
@@ -55,6 +60,7 @@ def index(request):
         result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s",
                                     (telegram_id,))
         EMPTY_CONTEXT['balance'] = result_balance[0][0]
+        request.session['balance'] = result_balance[0][0]
         return render(request, "videopoker/index.html", EMPTY_CONTEXT)
 
     # Below for the cases when session variable 'telegram_id' not specified yet
@@ -65,6 +71,7 @@ def index(request):
             telegram_id = 438763601
             result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
             EMPTY_CONTEXT['balance'] = result_balance[0][0]
+            request.session['balance'] = result_balance[0][0]
             return render(request, "videopoker/index.html", EMPTY_CONTEXT)
 
         # Probably user is not logged in yet
@@ -90,25 +97,27 @@ def index(request):
             
             if result_balance:
                 # The record is in database
-                request.session['telegram_id'] = telegram_id
+                request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
+                request.session['balance'] = result_balance[0][0]
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
             else:
                 # The record is not in database yet. Creating new record.
                 insert_user_sql = '''INSERT INTO videopoker_users (telegram_id, first_name, last_name, username, language_code, 
                                 allows_write_to_pm, is_premium, photo_url, balance) 
-                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;
                 
                 '''
-                is_premium = user.data.get('is_premium', False)
-                photo_url = user.data.get('photo_url', None)
+                is_premium = user_data.get('is_premium', False)
+                photo_url = user_data.get('photo_url', False)
 
                 data_tuple = (user_data['id'], user_data['first_name'], user_data['last_name'], user_data['username'],
                             user_data['language_code'], user_data['allows_write_to_pm'], is_premium, photo_url,
                             INITIAL_CHIPS_AMOUNT)
                 result = database_connect.execute_insert_update_sql(insert_user_sql, data_tuple)
-                request.session['telegram_id'] = telegram_id
+                request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance']  = INITIAL_CHIPS_AMOUNT
+                request.session['balance'] = INITIAL_CHIPS_AMOUNT
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
                 
         else:
@@ -116,13 +125,14 @@ def index(request):
             return redirect("https://t.me/VideoPokerMiniAppBot/VideoPoker")
         
     
-
+# This view is used to control game flow (Hands dealt and assessed)
 def deal(request):
     if request.method == "POST":
         if request.session.get('dealt', False) == True:
             request.session['dealt'] = False # Changing card deal/draw phase.
             # Cards are dealt and now needs to be drawn. Cards verifiction below.
-            held = int(request.POST.get('held'))
+            held = int(request.POST.get('held')) # Need to verify held value
+            telegram_id = request.session['telegram_id']
             new_hand_of_cards = []
             cards_to_evaluate = []
             context = {}
@@ -151,19 +161,45 @@ def deal(request):
                     card_list[0] = '10' + card_list[0][1:]
 
             value_of_new_hand = deal_draw.evaluate_hand(cards_to_evaluate)
+            context['combination'] = COMBINATIONS_ID[value_of_new_hand]
+
+            if context['combination'] > 1:
+                # Hand has winning combination. Updating balance.
+                bet_m = request.session['bet_m']
+                if context['combination'] == 10 and bet_m == 5:
+                    # Royal Flush with max bet identified. Different multiplier applied.
+                    winning_value = BET_MIN * 4000
+                else:
+                    winning_value = COMBINATIONS_FACTOR[value_of_new_hand] * BET_MIN * bet_m
+                balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s WHERE telegram_id = %s RETURNING balance;'''
+                result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (winning_value, telegram_id))
+                if result_balance:
+                    context['balance'] = result_balance[0]
+                    request.session['balance'] = context['balance']
+            else:
+                # The hand is not winning. Need to return previous value of the balance.
+                context['balance'] = request.session['balance']
 
 
+            # Saving hand into database.
+            saving_hand_sql = '''INSERT INTO videopoker_Hands_dealt (user_id_id, date_time, bet_multiplier, initial_hand,
+            extra_cards, final, final_comb_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;
+            '''
             return render(request, "videopoker/deal.html", context)
         else:
             # New hand is dealt.
             # 1. Need to verify current balance first.
-            telegram_id = int(request.session['telegram_id'])
-            bet_m = request.POST.get('bet_m', 1) # Bet_m validation required too.
+            telegram_id = request.session['telegram_id']
+            bet_m = int(request.POST.get('bet_m', 1)) # Bet_m validation required too.
             request.session['bet_m'] = bet_m
 
-            current_bet = int(bet_m) * BET_FACTOR
-
-            context = get_context(current_bet, telegram_id)
+            current_bet = bet_m * BET_MIN
+            if request.session['balance'] >= current_bet:
+                context = get_context(current_bet, telegram_id)
+            else:
+                # Current bet is higher than balance
+                return render(request, "videopoker/deal.html", CLOWN_CONTEXT)
 
             if context['balance'] < 0:
                 # Not enough chips for a bet
@@ -175,7 +211,7 @@ def deal(request):
                 request.session['drawn_cards'] = [x[:] for x in context['drawn_cards']] # to create deep copy list
                 request.session['extra_cards'] = context['extra_cards']
                 request.session['dealt'] = True
-                
+                request.session['balance'] = context['balance']
                 for card_list in context['drawn_cards']:
                     if 'T' in card_list[0]:
                         card_list[0] = '10' + card_list[0][1:]

@@ -191,6 +191,10 @@ div.buttons, div.balance {
     color: white;
   }
 
+  .row_combination {
+    background-color: var(--second-color) !important;
+    color:var(--fourth-color);
+  }
   .alternate {
     background-color: var(--fourth-color);
   }

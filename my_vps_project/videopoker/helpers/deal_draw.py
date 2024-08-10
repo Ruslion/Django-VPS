@@ -50,7 +50,7 @@ def evaluate_hand(hand):
         if pairs_ranks[0] in '89TJQKA':
             return 'Eights or Better'
         else:
-            return 'No_value'
+            return 'No value'
 
     if pairs == 2:
         return 'Two pairs'
@@ -101,4 +101,4 @@ def evaluate_hand(hand):
     if all([flush, straight]):
         return 'Straight Flush'
     
-    return 'No_value'
+    return 'No value'

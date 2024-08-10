@@ -14,7 +14,7 @@
       <col id="col_4">
       <col id="col_5">
     </colgroup>
-    <tr>
+    <tr id="tr_10">
       <td>ROYAL FLUSH</td>
       <td>250</td>
       <td>500</td>
@@ -22,7 +22,7 @@
       <td>1000</td>
       <td>4000</td>
     </tr>
-    <tr class="alternate">
+    <tr id="tr_9" class="alternate">
       <td>STRAIGHT FLUSH</td>
       <td>50</td>
       <td>100</td>
@@ -30,7 +30,7 @@
       <td>200</td>
       <td>250</td>
     </tr>
-    <tr>
+    <tr id="tr_8">
       <td>FOUR OF A KIND</td>
       <td>25</td>
       <td>50</td>
@@ -38,7 +38,7 @@
       <td>100</td>
       <td>125</td>
     </tr>
-    <tr class="alternate">
+    <tr id="tr_7" class="alternate">
       <td>FULL HOUSE</td>
       <td>9</td>
       <td>18</td>
@@ -46,7 +46,7 @@
       <td>36</td>
       <td>45</td>
     </tr>
-    <tr>
+    <tr id="tr_6">
       <td>FLUSH</td>
       <td>6</td>
       <td>12</td>
@@ -54,7 +54,7 @@
       <td>24</td>
       <td>30</td>
     </tr>
-    <tr class="alternate">
+    <tr  id="tr_5" class="alternate">
       <td>STRAIGHT</td>
       <td>4</td>
       <td>8</td>
@@ -62,7 +62,7 @@
       <td>16</td>
       <td>20</td>
     </tr>
-    <tr>
+    <tr  id="tr_4">
       <td>THREE OF A KIND</td>
       <td>3</td>
       <td>6</td>
@@ -70,7 +70,7 @@
       <td>12</td>
       <td>15</td>
     </tr>
-    <tr class="alternate">
+    <tr   id="tr_3" class="alternate">
       <td>TWO PAIR</td>
       <td>2</td>
       <td>4</td>
@@ -78,8 +78,8 @@
       <td>8</td>
       <td>10</td>
     </tr>
-    <tr>
-      <td>JACKS OR BETTER</td>
+    <tr   id="tr_2">
+      <td>EIGHTS OR BETTER</td>
       <td>1</td>
       <td>2</td>
       <td>3</td>
@@ -113,6 +113,7 @@
     {% endfor %}
 
     <input type="hidden" name="held" id="held" value="0">
+    <input type="hidden"  id="combination" value="{{combination}}">
     
   </div>
     <div class="balance"><span>Balance: {{balance}} chips</span>
@@ -133,6 +134,14 @@
 <script>
   // Start coloring cards when loaded.
   document.body.addEventListener('htmx:afterSettle', function (evt) {
+    var comb = document.getElementById("combination").value;
+    
+    
+    if (comb > 1) {
+      if (!document.getElementById("tr_" + comb).classList.contains('row_combination')) {
+      document.getElementById("tr_" + comb).classList.add("row_combination");
+      }
+    }
     
     
   });
@@ -148,6 +157,13 @@
       } else {
 
         document.getElementById("card_" + index).classList.remove('flip-animation');
+      }
+      
+    }
+
+    for (let index = 2; index < 11; index++) {
+      if (document.getElementById("tr_" + index).classList.contains('row_combination')) {
+        document.getElementById("tr_" + index).classList.remove("row_combination");
       }
       
     }
