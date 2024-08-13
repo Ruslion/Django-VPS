@@ -32,6 +32,7 @@ def get_context(current_bet, telegram_id):
     value_of_new_hand = deal_draw.evaluate_hand(drawn_cards)
     context = {'drawn_cards':[], 'extra_cards':extra_cards}
     context['combination'] = COMBINATIONS_ID[value_of_new_hand]
+    context['dealt'] = True
     for card in drawn_cards:
         card_and_color = []
         card_and_color.append(card)
@@ -123,13 +124,14 @@ def index(request):
 def deal(request):
     if request.method == "POST":
         if request.session.get('dealt', False) == True:
-            request.session['dealt'] = False # Changing card deal/draw phase.
+            request.session['dealt'] = False # Changing card deal/draw stage.
             # Cards are dealt and now needs to be drawn. Cards verifiction below.
             held = int(request.POST.get('held')) # Need to verify held value
             telegram_id = request.session['telegram_id']
             new_hand_of_cards = []
             cards_to_evaluate = []
             context = {}
+            context['dealt'] = False
             for index, value in enumerate(HELD_VALUES):
                 if held >= value:
                     # This index card is held
@@ -194,6 +196,7 @@ def deal(request):
             return render(request, "videopoker/deal.html", context)
         else:
             # New hand is dealt.
+            request.session['dealt'] = True # Changing card deal/draw stage.
             # 1. Need to verify current balance first.
             telegram_id = request.session['telegram_id']
             bet_m = int(request.POST.get('bet_m', 1)) # Bet_m validation required too.
@@ -206,27 +209,22 @@ def deal(request):
                 # Current bet is higher than balance
                 return render(request, "videopoker/deal.html", CLOWN_CONTEXT)
 
-            if context['balance'] < 0:
-                # Not enough chips for a bet
-                # Need to restore balance respectively.
-                balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s WHERE telegram_id = %s;'''
-                result_balance_update = database_connect.execute_insert_update_sql(balance_update_sql, (current_bet, telegram_id,))
-                # Balance is not enough to place a bet.
-            else:
-                request.session['drawn_cards'] = [x[:] for x in context['drawn_cards']] # to create deep copy list
-                
-                request.session['extra_cards'] = context['extra_cards']
-                request.session['dealt'] = True
-                request.session['balance'] = context['balance']
-                for card_list in context['drawn_cards']:
-                    if 'T' in card_list[0]:
-                        card_list[0] = '10' + card_list[0][1:]
-                
-                
-                return render(request, "videopoker/deal.html", context)
+            
+            request.session['drawn_cards'] = [x[:] for x in context['drawn_cards']] # to create deep copy list
+            request.session['extra_cards'] = context['extra_cards']
+            request.session['balance'] = context['balance']
+            for card_list in context['drawn_cards']:
+                if 'T' in card_list[0]:
+                    card_list[0] = '10' + card_list[0][1:]
+            
+            
+            return render(request, "videopoker/deal.html", context)
 
     if request.method == "GET": # Returning NO ACCESS list of string if accessed via GET method.
         return render(request, "videopoker/deal.html", CLOWN_CONTEXT)
+
+def leaderboard(request):
+    return render(request, "videopoker/leaderboard.html", EMPTY_CONTEXT)
     
     
     

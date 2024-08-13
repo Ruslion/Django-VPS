@@ -1,4 +1,5 @@
 {% extends 'videopoker/base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="title">
@@ -114,6 +115,7 @@
 
     <input type="hidden" name="held" id="held" value="0">
     <input type="hidden"  id="combination" value="{{combination}}">
+    <input type="hidden"  id="dealt" value="{{dealt}}">
     
   </div>
     <div class="balance"><span>Balance: {{balance}} chips</span>
@@ -122,24 +124,64 @@
 </div>
   
   <div class="buttons">
-    <button name="bet_button" type="button" class="button" role="button" onclick="bet_increase()">Bet</button>
-    <button type="button" class="button" role="button" hx-post="/videopoker/deal/" hx-target="#table">Deal</button>
+    <button name="bet_button" id="bet_button" type="button" class="button" role="button" onclick="bet_increase()">Bet</button>
+    <button type="button" id="deal_button" class="button" role="button" hx-post="/videopoker/deal/" hx-target="#table">Deal</button>
   </div>
   <input type="hidden" name="bet_m" id="bet_m" value="1">
+  
+  <audio id="audio" src="{% static 'videopoker/notify_win_hand.mp3' %}" ></audio>
+  <audio id="audio_win" src="{% static 'videopoker/win_hand_straight_and_higher.mp3' %}" ></audio>
+  <audio id="audio_win_rf" src="{% static 'videopoker/royal_flush.mp3' %}" ></audio>
 </form>
 
 
 
 
 <script>
-  // Start coloring cards when loaded.
+  
   document.body.addEventListener('htmx:afterSettle', function (evt) {
+    var audio = document.getElementById("audio");
+    var audio_win = document.getElementById("audio_win");
     var comb = document.getElementById("combination").value;
-    
-    
+    var dealt = document.getElementById("dealt").value;
+    var bet_button = document.getElementById("bet_button");
+    var deal_button = document.getElementById("deal_button");
+
+    deal_button.removeAttribute('DISABLED', false); // Enabling Deal button.
+
+    if (dealt == 'True') { // Cards are just dealt and ready to be drawn.
+      bet_button.setAttribute('DISABLED', true);
+      deal_button.innerHTML = 'Draw';
+      
+    } else { // Cards are ready to be dealt again.
+      bet_button.removeAttribute('DISABLED', false);
+      deal_button.innerHTML = 'Deal';
+    }
+
     if (comb > 1) {
       if (!document.getElementById("tr_" + comb).classList.contains('row_combination')) {
-      document.getElementById("tr_" + comb).classList.add("row_combination");
+        if (dealt == 'True') { // Cards are just dealt and hand is winning. Notification audio is played.
+          audio.pause();
+          audio.currentTime = 0;
+          audio.play();
+        }
+        else { // Final hand is presented.
+          if (comb > 4) { // Winning hand audio played.
+            if (comb < 10) {
+              audio_win.pause();
+              audio_win.currentTime = 0;
+              audio_win.play();
+            }
+
+            else { // Royal flush audio is played.
+              audio_win_rf.pause();
+              audio_win_rf.currentTime = 0;
+              audio_win_rf.play();
+            }
+            
+          }
+        }
+        document.getElementById("tr_" + comb).classList.add("row_combination");
       }
     }
     
@@ -148,6 +190,9 @@
 
   //Flipping cards before the draw and return to normal place after the hold animation.
   document.body.addEventListener('htmx:beforeRequest', function (evt) {
+    var deal_button = document.getElementById("deal_button");
+    deal_button.setAttribute('DISABLED', true); // Disabling Deal button until the cards are dealt.
+
     var held_cards_value = parseInt(document.getElementById("held").value);
     const values = [16, 8, 4, 2, 1];
 
@@ -188,6 +233,11 @@
   // };
 
   function hold_card(card_clicked, id) {
+    var dealt = document.getElementById("dealt").value;
+
+    if (dealt == 'False') {
+      return; // Cards are drawn already. Ready to be dealt.
+    }
     var values = [16, 8, 4, 2, 1];
     var grandParent = card_clicked.parentElement.parentElement;
      if (grandParent.classList.contains("hold_animation")) {
