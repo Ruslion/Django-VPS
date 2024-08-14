@@ -180,14 +180,13 @@ def deal(request):
 
             # Saving hand into database.
             saving_hand_sql = '''INSERT INTO videopoker_Hands_dealt (user_id_id, date_time, bet_multiplier, initial_hand,
-            extra_cards, final, win_amount, final_comb_id)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;
+            final, win_amount, final_comb_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;
             '''
             
 
             insert_tuple = (request.session['user_id'], datetime.now(), int(request.session['bet_m']), 
                             ''.join([card_list[0] for card_list in request.session['drawn_cards']]), # Initial cards
-                            ''.join(request.session['extra_cards']), # extra cards
                             ''.join(cards_to_evaluate), # final cards
                             winning_value,
                             context['combination'])
@@ -224,7 +223,37 @@ def deal(request):
         return render(request, "videopoker/deal.html", CLOWN_CONTEXT)
 
 def leaderboard(request):
-    return render(request, "videopoker/leaderboard.html", EMPTY_CONTEXT)
+    # Selecting leaders for the previous day
+    select_leaders_sql = '''SELECT username, SUM(win_amount) AS win from videopoker_hands_dealt hd 
+                            JOIN videopoker_users u ON u.id = hd.user_id_id
+                            WHERE hd.date_time = CURRENT_DATE - 1
+                            GROUP BY username
+                            ORDER by win DESC 
+                            LIMIT 100;'''
+    result_balance = database_connect.execute_select_sql(select_leaders_sql, None)
+    
+    context = {'leaders':result_balance}
+    return render(request, "videopoker/leaderboard.html", context)
+
+def leaders(request):
+    if request.method == "GET":
+        # The page accessed via GET. Nothing to be shown.
+        context = {'leaders':[{'username':'Clown',
+                                'won':u"\U0001F921"},
+            
+        ]}
+        return render(request, "videopoker/leaders.html", context)
+
+    # Rendering Top 100 players based on the filters.
+    select_leaders_sql = '''SELECT username, SUM(win_amount) AS win from videopoker_hands_dealt hd 
+                            JOIN videopoker_users u ON u.id = hd.user_id_id
+                            WHERE hd.date_time = CURRENT_DATE - 1
+                            GROUP BY username
+                            ORDER by win DESC 
+                            LIMIT 100;'''
+    result_balance = database_connect.execute_select_sql(select_leaders_sql, None)
+    context = {'leaders':result_balance}
+    return render(request, "videopoker/leaders.html", context)
     
     
     

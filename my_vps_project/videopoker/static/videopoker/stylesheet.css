@@ -12,17 +12,11 @@ body {
   font-family: "JetBrains Mono",monospace;
 }
 
-table {
-  width:100%;
-  border:3px solid;
-  border-color:var(--fifth-color); 
-  margin:auto; 
-  font-size:medium;
-  color:var(--third-color);
-  text-align: left;
+
+
+th {
+  width: 20%;
 }
-
-
 
 h2 {
   margin:auto;
@@ -34,6 +28,41 @@ span {
   margin:auto;
   color: var(--third-color);
   
+}
+
+select {
+  font-size:medium;
+  color:var(--third-color);
+  background-color: var(--base-color);
+  font-size:medium;
+  font-family: "JetBrains Mono",monospace;
+  
+}
+
+.selected_filter {
+  background-color: var(--fourth-color);
+  border: 1px solid;
+}
+
+.multiplier_table {
+  width:100%;
+  border:3px solid;
+  border-color:var(--fifth-color); 
+  margin:auto; 
+  font-size:medium;
+  color:var(--third-color);
+  text-align: left;
+}
+
+.leaderboard {
+  /* table-layout: fixed; */
+  width:100%;
+  border:3px solid;
+  border-color:var(--fifth-color); 
+  margin:auto; 
+  font-size:medium;
+  color:var(--third-color);
+  text-align: center;
 }
 
 .hold_animation {
@@ -195,7 +224,7 @@ div.buttons, div.balance {
     background-color: var(--second-color) !important;
     color:var(--fourth-color);
   }
-  .alternate {
+  tr:nth-child(even) {
     background-color: var(--fourth-color);
   }
 

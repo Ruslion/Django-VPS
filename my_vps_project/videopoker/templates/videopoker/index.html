@@ -2,11 +2,9 @@
 {% load static %}
 
 {% block content %}
-<div class="title">
-  <h2>Eights or better</h2>
-</div>
-<div class="multiplier_table">
-  <table>
+
+<div >
+  <table class="multiplier_table">
     <colgroup>
       <col id="col_0">
       <col id="col_1">
@@ -23,7 +21,7 @@
       <td>1000</td>
       <td>4000</td>
     </tr>
-    <tr id="tr_9" class="alternate">
+    <tr id="tr_9">
       <td>STRAIGHT FLUSH</td>
       <td>50</td>
       <td>100</td>
@@ -39,7 +37,7 @@
       <td>100</td>
       <td>125</td>
     </tr>
-    <tr id="tr_7" class="alternate">
+    <tr id="tr_7" >
       <td>FULL HOUSE</td>
       <td>9</td>
       <td>18</td>
@@ -55,7 +53,7 @@
       <td>24</td>
       <td>30</td>
     </tr>
-    <tr  id="tr_5" class="alternate">
+    <tr  id="tr_5" >
       <td>STRAIGHT</td>
       <td>4</td>
       <td>8</td>
@@ -71,7 +69,7 @@
       <td>12</td>
       <td>15</td>
     </tr>
-    <tr   id="tr_3" class="alternate">
+    <tr   id="tr_3" >
       <td>TWO PAIR</td>
       <td>2</td>
       <td>4</td>
@@ -92,7 +90,7 @@
 </div>
 <form>
   {% csrf_token %}
-<div id="table">
+
   <div class="held">
     <div class="held-caption" id="held_0"><span >Held</span></div>
     <div class="held-caption" id="held_1"><span>Held</span></div>
@@ -100,6 +98,7 @@
     <div class="held-caption" id="held_3"><span>Held</span></div>
     <div class="held-caption" id="held_4"><span>Held</span></div>
   </div>
+  <div id="table">
   <div id='hand' class="hand">
     {% for card in drawn_cards%}
     <div class="flip-card">
@@ -116,6 +115,7 @@
     <input type="hidden" name="held" id="held" value="0">
     <input type="hidden"  id="combination" value="{{combination}}">
     <input type="hidden"  id="dealt" value="{{dealt}}">
+    <input type="hidden"  id="balance" value="{{balance}}">
     
   </div>
     <div class="balance"><span>Balance: {{balance}} chips</span>
@@ -140,6 +140,13 @@
 <script>
   
   document.body.addEventListener('htmx:afterSettle', function (evt) {
+
+    var elements = document.getElementsByClassName("held-caption");
+
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].style='visibility:hidden';
+        }
+
     var audio = document.getElementById("audio");
     var audio_win = document.getElementById("audio_win");
     var comb = document.getElementById("combination").value;
@@ -189,7 +196,7 @@
   });
 
   //Flipping cards before the draw and return to normal place after the hold animation.
-  document.body.addEventListener('htmx:beforeRequest', function (evt) {
+  document.body.addEventListener('htmx:confirm', function (evt) {
     var deal_button = document.getElementById("deal_button");
     deal_button.setAttribute('DISABLED', true); // Disabling Deal button until the cards are dealt.
 

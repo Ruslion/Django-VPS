@@ -1,10 +1,3 @@
-<div class="held">
-  <div class="held-caption" id="held_0"><span >Held</span></div>
-  <div class="held-caption" id="held_1"><span>Held</span></div>
-  <div class="held-caption" id="held_2"><span>Held</span></div>
-  <div class="held-caption" id="held_3"><span>Held</span></div>
-  <div class="held-caption" id="held_4"><span>Held</span></div>
-</div>
 <div id='hand' class="hand">
 {% for card, color in drawn_cards%}
   <div class="flip-card" >
@@ -21,6 +14,8 @@
  <input type="hidden" name="held" id="held" value="0">
  <input type="hidden"  id="combination" value="{{combination}}">
  <input type="hidden"  id="dealt" value="{{dealt}}">
+ <input type="hidden"  id="balance" value="{{balance}}">
+ 
 </div>
 <div class="balance"><span>Balance: {{balance}} chips</span>
 

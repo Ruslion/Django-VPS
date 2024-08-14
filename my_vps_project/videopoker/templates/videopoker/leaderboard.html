@@ -1,144 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Poker Slot Game - Leaderboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            text-align: center;
-            padding: 20px 0;
-            background-color: #4CAF50;
-            color: white;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-        }
-        .tabs {
-            display: flex;
-            justify-content: space-around;
-            background-color: #333;
-            padding: 10px 0;
-        }
-        .tab {
-            color: white;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        .tab:hover {
-            background-color: #4CAF50;
-        }
-        .tab.active {
-            background-color: #4CAF50;
-        }
-        .leaderboard {
-            margin-top: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .leaderboard-header {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background-color: #333;
-            color: white;
-        }
-        .leaderboard-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-        }
-        .leaderboard-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 20px;
-            border-bottom: 1px solid #ddd;
-        }
-        .leaderboard-item:nth-child(odd) {
-            background-color: #f9f9f9;
-        }
-        .leaderboard-item:last-child {
-            border-bottom: none;
-        }
-        .leaderboard-item .rank {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-        .leaderboard-item .name {
-            flex-grow: 2;
-            margin-left: 20px;
-            font-weight: bold;
-        }
-        .leaderboard-item .score {
-            font-size: 1.2rem;
-            color: #4CAF50;
-        }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #333;
-            color: white;
-            margin-top: 40px;
-        }
-    </style>
-</head>
-<body>
+{% extends 'videopoker/base.html' %}
+{% load static %}
 
-<div class="container">
-    <div class="header">
-        <h1>Leaderboard</h1>
-    </div>
-
-    <div class="tabs">
-        <div class="tab active">Global</div>
-        <div class="tab">Friends</div>
-        <div class="tab">Events</div>
-        <div class="tab">Achievements</div>
-    </div>
-
-    <div class="leaderboard">
-        <div class="leaderboard-header">
-            <h2>Global Leaderboard - All Time</h2>
-            <span>Top 10 Players</span>
-        </div>
-        <ul class="leaderboard-list">
-            <li class="leaderboard-item">
-                <span class="rank">1</span>
-                <span class="name">PlayerOne</span>
-                <span class="score">500,000</span>
-            </li>
-            <li class="leaderboard-item">
-                <span class="rank">2</span>
-                <span class="name">PlayerTwo</span>
-                <span class="score">450,000</span>
-            </li>
-            <!-- Add more players here -->
-        </ul>
-    </div>
+{% block content %}
+<div >
+    <h2>Leaderboard</h2>
+<form>     {% csrf_token %}
+<table class="leaderboard">
+    <tr>
+        <th id="day" class="selected_filter" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Day</th>
+        <th id="week" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Week</th>
+        <th id="month" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Month</th>
+        <th id="all-time" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">All-time</th>
+        <th>
+            Locale
+            <select hx-post="/videopoker/leaders" hx-target="#leaderboard_table" hx-trigger="changed">
+            <option>All</option>
+            <option>Ru</option>
+            <option>En</option>
+        </select></th>
+    </tr>
+</table>
+<br>
+<table class="leaderboard" id="leaderboard_table">
+    
+    <tr><td >Rank</td><td >Username</td><td>Amount Won</td></tr>
+    {% for username, won in leaders%}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td>{{username}}</td>
+        <td>{{won}}</td>
+    </tr>
+    {% endfor %}
+</table>
+<input id='filter' name="filter" type="hidden" value="day">
+<input id='locale_filter' name='locale_filter' type="hidden" value="all">
+</form> 
 </div>
+<script>
+    document.body.addEventListener('htmx:configRequest', function (evt) {
+        const keywords_list = ['day', 'week', 'month', 'all-time' ];
 
-<div class="footer">
-    <p>&copy; 2024 Video Poker Slot Game. All Rights Reserved.</p>
-</div>
+        let i = 0;
 
-</body>
-</html>
+        // Removing class 'selected_filter'
+        while (i < keywords_list.length) {
+            document.getElementById(keywords_list[i]).classList.remove('selected_filter');
+            keywords_list[i]
+            i++;
+        }
+
+
+        if (evt.detail.elt.tagName == 'TH') {
+            var formData = evt.detail.parameters;
+            formData['filter'] = evt.detail.elt.id;
+            document.getElementById("filter").value = evt.detail.elt.id;
+            evt.detail.elt.classList.add('selected_filter')
+        }
+        
+        
+    });
+</script>
+{% endblock %}
