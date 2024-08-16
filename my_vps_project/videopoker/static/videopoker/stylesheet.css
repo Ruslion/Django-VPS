@@ -10,6 +10,7 @@
 body {
   background-color: var(--base-color);
   font-family: "JetBrains Mono",monospace;
+  color: var(--third-color);
 }
 
 
@@ -21,6 +22,7 @@ th {
 h2 {
   margin:auto;
   width:fit-content;
+  max-width: 70vw;
   color: var(--third-color);
 }
 
@@ -151,6 +153,7 @@ div.buttons, div.balance {
 
 .title {
   width: 100%;
+  display: flex;
 }
 .hand, .held {
     display:flex;

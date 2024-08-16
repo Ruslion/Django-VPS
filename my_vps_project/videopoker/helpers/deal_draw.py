@@ -47,8 +47,8 @@ def evaluate_hand(hand):
             return 'Four of a Kind'
     
     if pairs == 1 and not three_of_kind:
-        if pairs_ranks[0] in '89TJQKA':
-            return 'Eights or Better'
+        if pairs_ranks[0] in 'TJQKA':
+            return 'Tens or Better'
         else:
             return 'No value'
 

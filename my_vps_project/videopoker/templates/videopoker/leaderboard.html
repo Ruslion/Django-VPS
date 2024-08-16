@@ -3,7 +3,10 @@
 
 {% block content %}
 <div >
-    <h2>Leaderboard</h2>
+    <div class="title">
+    <a  onclick="history.back()" style="text-decoration: none;"><span style="font-size:xxx-large">&#8656;</span></a><h2>Leaderboard</h2>
+    </div>
+    <div>Server time: {{server_time}}</div>
 <form>     {% csrf_token %}
 <table class="leaderboard">
     <tr>
@@ -11,12 +14,13 @@
         <th id="week" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Week</th>
         <th id="month" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Month</th>
         <th id="all-time" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">All-time</th>
-        <th>
+        <th id="locale">
             Locale
-            <select hx-post="/videopoker/leaders" hx-target="#leaderboard_table" hx-trigger="changed">
-            <option>All</option>
-            <option>Ru</option>
-            <option>En</option>
+            <select id='locale_filter' name='locale_filter' hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="change">
+            <option value="all">All</option>
+            {% for loc in locale%}
+                <option value="{{loc}}">{{loc}}</option>
+            {% endfor %}
         </select></th>
     </tr>
 </table>
@@ -33,28 +37,40 @@
     {% endfor %}
 </table>
 <input id='filter' name="filter" type="hidden" value="day">
-<input id='locale_filter' name='locale_filter' type="hidden" value="all">
+<!-- <input id='locale_filter' name='locale_filter' type="hidden" value="all"> -->
 </form> 
 </div>
 <script>
     document.body.addEventListener('htmx:configRequest', function (evt) {
-        const keywords_list = ['day', 'week', 'month', 'all-time' ];
-
-        let i = 0;
-
-        // Removing class 'selected_filter'
-        while (i < keywords_list.length) {
-            document.getElementById(keywords_list[i]).classList.remove('selected_filter');
-            keywords_list[i]
-            i++;
-        }
-
-
         if (evt.detail.elt.tagName == 'TH') {
+            const keywords_list = ['day', 'week', 'month', 'all-time' ];
+            let i = 0;
+            // Removing class 'selected_filter'
+            while (i < keywords_list.length) {
+                document.getElementById(keywords_list[i]).classList.remove('selected_filter');
+                keywords_list[i]
+                i++;
+            }
+            // Updating form prior to sending
             var formData = evt.detail.parameters;
             formData['filter'] = evt.detail.elt.id;
             document.getElementById("filter").value = evt.detail.elt.id;
             evt.detail.elt.classList.add('selected_filter')
+        }
+
+        if (evt.detail.elt.tagName == 'SELECT') {
+            if (evt.detail.elt.value != 'all') {
+                // Some locale selected
+                document.getElementById("locale").classList.add('selected_filter');
+                evt.detail.elt.classList.add('selected_filter')
+            }
+            else {
+                // Locale filter reset
+                document.getElementById("locale").classList.remove('selected_filter');
+                evt.detail.elt.classList.remove('selected_filter')
+            }
+            
+            
         }
         
         

@@ -2,9 +2,13 @@
 {% load static %}
 
 {% block content %}
-
+<div class="title">
+  <h2>Tens or better</h2>
+  <a  href="/videopoker/leaderboard/"><img style="max-width:10vw;" src="{% static 'videopoker/ladder.png' %}" title="Leaderboard"></a>
+  <img style="max-width: 10vw;" src="{% static 'videopoker/chips.png' %}">
+</div>
 <div >
-  <table class="multiplier_table">
+  <table class="multiplier_table">  
     <colgroup>
       <col id="col_0">
       <col id="col_1">
@@ -78,7 +82,7 @@
       <td>10</td>
     </tr>
     <tr   id="tr_2">
-      <td>EIGHTS OR BETTER</td>
+      <td>TENS OR BETTER</td>
       <td>1</td>
       <td>2</td>
       <td>3</td>

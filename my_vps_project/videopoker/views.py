@@ -4,7 +4,7 @@ from .helpers.init_data_verification import check_webapp_signature
 from .helpers import database_connect
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 TEL_TOKEN = os.environ['TEL_TOKEN']
@@ -21,10 +21,10 @@ HELD_VALUES = [16, 8, 4, 2, 1] # Held values are used to encode/decode the held 
 
 # Combinations IDs as in database.
 COMBINATIONS_ID = {'Royal Flush':10, 'Straight Flush':9, 'Four of a Kind':8, 'Full House':7,
-                   'Flush':6, 'Straight':5, 'Three of a Kind':4, 'Two pairs':3, 'Eights or Better':2,'No value':1}
+                   'Flush':6, 'Straight':5, 'Three of a Kind':4, 'Two pairs':3, 'Tens or Better':2,'No value':1}
 # Combinations winning factor
 COMBINATIONS_FACTOR = {'Royal Flush':250, 'Straight Flush':50, 'Four of a Kind':25, 'Full House':9,
-                   'Flush':6, 'Straight':4, 'Three of a Kind':3, 'Two pairs':2, 'Eights or Better':1,'No value':0}
+                   'Flush':6, 'Straight':4, 'Three of a Kind':3, 'Two pairs':2, 'Tens or Better':1,'No value':0}
 
 # Help function. Not view. This function prepares context for the new hand dealt.
 def get_context(current_bet, telegram_id):
@@ -132,6 +132,7 @@ def deal(request):
             cards_to_evaluate = []
             context = {}
             context['dealt'] = False
+            i = 0
             for index, value in enumerate(HELD_VALUES):
                 if held >= value:
                     # This index card is held
@@ -141,7 +142,8 @@ def deal(request):
                     
                 else:
                     # This index card is not held
-                    card = request.session['extra_cards'][index]
+                    card = request.session['extra_cards'][i]
+                    i+=1
                     cards_to_evaluate.append(card)
 
                     if card[1] in ['♥', '♦']:
@@ -230,9 +232,20 @@ def leaderboard(request):
                             GROUP BY username
                             ORDER by win DESC 
                             LIMIT 100;'''
-    result_balance = database_connect.execute_select_sql(select_leaders_sql, None)
+    result_leaders = database_connect.execute_select_sql(select_leaders_sql, None)
     
-    context = {'leaders':result_balance}
+    
+
+    select_locale_sql = '''SELECT language_code FROM videopoker_users
+                            GROUP BY language_code;
+                        '''
+    result_locale = database_connect.execute_select_sql(select_locale_sql, None)
+    context = {'leaders':result_leaders,
+                'locale':[l[0] for l in result_locale],
+                'server_time':datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+    
+    request.session['locale'] = context['locale']
     return render(request, "videopoker/leaderboard.html", context)
 
 def leaders(request):
@@ -240,19 +253,73 @@ def leaders(request):
         # The page accessed via GET. Nothing to be shown.
         context = {'leaders':[{'username':'Clown',
                                 'won':u"\U0001F921"},
-            
-        ]}
+                                {'username':'Clown',
+                                'won':u"\U0001F921"},
+                                {'username':'Clown',
+                                'won':u"\U0001F921"},
+                                {'username':'Clown',
+                                'won':u"\U0001F921"},
+            ]}
         return render(request, "videopoker/leaders.html", context)
 
     # Rendering Top 100 players based on the filters.
+    filter_for_sql = request.POST.get('filter', None)
+    filter_loc_for_sql = request.POST.get('locale_filter', None)
+
     select_leaders_sql = '''SELECT username, SUM(win_amount) AS win from videopoker_hands_dealt hd 
                             JOIN videopoker_users u ON u.id = hd.user_id_id
-                            WHERE hd.date_time = CURRENT_DATE - 1
-                            GROUP BY username
+                            WHERE '''
+                            # AND u.language_code LIKE %s
+                            
+
+    select_leaders_sql_ending = ''' GROUP BY username
                             ORDER by win DESC 
                             LIMIT 100;'''
-    result_balance = database_connect.execute_select_sql(select_leaders_sql, None)
-    context = {'leaders':result_balance}
+    match filter_for_sql:
+        case 'day':
+            filter_for_sql = 'hd.date_time = CURRENT_DATE - 1'
+        case 'week':
+            # Need to calculate the dates for the previous week
+            today = datetime.today().date()
+            start = today - timedelta(days=today.weekday() + 7)
+            end = start + timedelta(days=7)
+
+            start = start.strftime("%Y-%m-%d")
+            end = end.strftime("%Y-%m-%d")
+
+            filter_for_sql = f"""hd.date_time >= '{start}' AND hd.date_time < '{end}'
+                                """
+        case 'month':
+            # Need to calculate the dates for the previous month
+            end = datetime.today().replace(day=1).date()
+            start = (end - timedelta(days=1)).replace(day=1)
+
+            start = start.strftime("%Y-%m-%d")
+            end = end.strftime("%Y-%m-%d")
+
+            filter_for_sql = f"""hd.date_time >= '{start}' AND hd.date_time < '{end}'
+            """
+        case 'all-time':
+            filter_for_sql = """hd.date_time > '2024-01-01'
+                            """
+        case _:
+            # No valid filter. Applying day filter
+            filter_for_sql = 'hd.date_time = CURRENT_DATE - 1'
+    
+    if filter_loc_for_sql in request.session['locale']:
+        # Valid locale selected
+        filter_loc_for_sql = f""" AND u.language_code = '{filter_loc_for_sql}'
+                                """
+    else:
+        # No valid locale selected OR all selected.
+        filter_loc_for_sql = ""
+
+
+    # Final SQL combination
+    select_leaders_sql = select_leaders_sql + filter_for_sql + filter_loc_for_sql + select_leaders_sql_ending
+
+    result_leaders = database_connect.execute_select_sql(select_leaders_sql, None)
+    context = {'leaders':result_leaders}
     return render(request, "videopoker/leaders.html", context)
     
     
