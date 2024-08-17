@@ -1,10 +1,10 @@
 import psycopg2
-from django.conf import settings
+import os
 
 CONFIG = {'host':'localhost',
         'database':'postgres',
-        'user':settings.POSTGRES_USER,
-        'password': settings.POSTGRES_PASSWORD
+        'user':os.environ['POSTGRES_USER'],
+        'password': os.environ['POSTGRES_PASSWORD'],
         }
 
 

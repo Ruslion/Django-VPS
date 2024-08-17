@@ -7,4 +7,5 @@ urlpatterns = [
     path("deal/", views.deal, name="deal"),
     path("leaderboard/", views.leaderboard, name="leaderboard"),
     path("leaders/", views.leaders, name="leaders"),
+    path("createInvoiceLink/", views.createInvoiceLink, name="createInvoiceLink"),
 ]

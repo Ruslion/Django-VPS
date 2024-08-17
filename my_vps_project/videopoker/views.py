@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .helpers import deal_draw
 from .helpers.init_data_verification import check_webapp_signature
 from .helpers import database_connect
+from django.http import JsonResponse
 import os
 import json
 from datetime import datetime, timedelta
@@ -25,6 +26,13 @@ COMBINATIONS_ID = {'Royal Flush':10, 'Straight Flush':9, 'Four of a Kind':8, 'Fu
 # Combinations winning factor
 COMBINATIONS_FACTOR = {'Royal Flush':250, 'Straight Flush':50, 'Four of a Kind':25, 'Full House':9,
                    'Flush':6, 'Straight':4, 'Three of a Kind':3, 'Two pairs':2, 'Tens or Better':1,'No value':0}
+
+# The following dictionary is used for invoice creation. The keys: amount of chips to be bought, the value is the price in stars.
+AMOUNT_DICT = {'5000':'10',
+                    '10000':'228',
+                    '20000':'432',
+                    '40000':'816',
+                    '80000':'1536'}
 
 # Help function. Not view. This function prepares context for the new hand dealt.
 def get_context(current_bet, telegram_id):
@@ -321,6 +329,48 @@ def leaders(request):
     result_leaders = database_connect.execute_select_sql(select_leaders_sql, None)
     context = {'leaders':result_leaders}
     return render(request, "videopoker/leaders.html", context)
+
+def createInvoiceLink(request):
+    # This function returns InvoiceLink for payment.
+    if request.method == "GET":
+        # Request method GET. Returning nothing.
+        return JsonResponse ({"ok":false,"result":"failed"})
+    
+    if request.method == "POST":
+
+        amount_to_buy = request.POST.get('amount')
+
+        if amount_to_buy in AMOUNT_DICT.keys():
+            # valid amount
+            url_begin = 'https://api.telegram.org/bot'
+            method_name = '/createInvoiceLink'
+            url_final = url_begin + TEL_TOKEN + method_name
+            payload = {'telegram_id':request.session.get('telegram_id','0'),
+                        'amount':amount_to_buy,
+                        'price':AMOUNT_DICT[amount_to_buy]}
+            # Creating params based on the data from POST method
+            params = {'description': amount_to_buy + ' chips for Video Poker game',
+                'title': amount_to_buy + ' chips',
+                'payload': json.dumps(payload),
+                'currency': 'XTR',
+                'prices': '[{"label":' + amount_to_buy + ' chips","amount":' + AMOUNT_DICT[amount_to_buy] +'}]',
+                'photo_url': 'https://pychampion.site/static/videopoker/chips.png'
+                }
+            result = requests.get(url_final, params=params)
+            context = json.loads(result.text)
+            if 'result' not in context.keys():
+                context['result'] = 'Request failed'
+            if 'description' not in context.keys():
+                context['description'] = 'No description'
+            return render(request, "videopoker/invoiceLink.html", context)
+        else:
+            # invalid amount
+            return JsonResponse ({"ok":false,"result":"failed"})
+        
+
+
+
+
     
     
     
