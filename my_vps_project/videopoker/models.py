@@ -24,5 +24,31 @@ class Hands_dealt(models.Model):
 class Combinations(models.Model):
     combination = models.CharField(max_length=20)
 
+class SuccessfulPayment(models.Model):
+    date_time = models.DateTimeField(auto_now_add=True)
+    currency = models.CharField(max_length=3)
+    total_amount = models.PositiveSmallIntegerField()
+    chips_bought = models.PositiveIntegerField()
+    telegram_id = models.PositiveBigIntegerField(blank=True)
+    telegram_payment_charge_id = models.CharField(max_length=512)
+    provider_payment_charge_id = models.CharField(max_length=512)
+
+class All_Time_stats(models.Model):
+    user_id = models.ForeignKey("Users", on_delete=models.CASCADE)
+    hands_dealt = models.PositiveBigIntegerField()
+    amount_won = models.PositiveBigIntegerField()
+    royal_flush = models.PositiveIntegerField()
+    straight_flush = models.PositiveIntegerField()
+    four_of_kind = models.PositiveIntegerField()
+    full_house =  models.PositiveIntegerField()
+    flush =  models.PositiveIntegerField()
+    straight = models.PositiveIntegerField()
+    three_of_kind = models.PositiveIntegerField()
+    two_pairs = models.PositiveIntegerField()
+    jacks_or_better = models.PositiveBigIntegerField()
+    no_value_hand = models.PositiveBigIntegerField()
+
+
+
 
 

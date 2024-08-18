@@ -3,9 +3,9 @@
 
 {% block content %}
 <div class="title">
-  <h2>Tens or better</h2>
+  <h2>Jacks or better</h2>
   <a  href="/videopoker/leaderboard/"><img style="max-width:10vw;" src="{% static 'videopoker/ladder.png' %}" title="Leaderboard"></a>
-  <img style="max-width: 10vw;" src="{% static 'videopoker/chips.png' %}">
+  <img style="max-width: 10vw;cursor:pointer;" src="{% static 'videopoker/chips.png' %}" onclick="show_modal()">
 </div>
 <div >
   <table class="multiplier_table">  
@@ -82,7 +82,7 @@
       <td>10</td>
     </tr>
     <tr   id="tr_2">
-      <td>TENS OR BETTER</td>
+      <td>JACKS OR BETTER</td>
       <td>1</td>
       <td>2</td>
       <td>3</td>
@@ -138,12 +138,82 @@
   <audio id="audio_win_rf" src="{% static 'videopoker/royal_flush.mp3' %}" ></audio>
 </form>
 
+<div class="modal-backdrop" >
+  <div class="modal-content" >
+      <form>
+          {% csrf_token %}
+          <div class="close" onclick="hide_modal()">&#10006;</div>
+          
+          <div style="display:flex;">
+              <!-- <img src="{% static 'videopoker/chips.png' %}" style="max-width:10vw;margin:auto;"> -->
+              
+
+
+          <table class = "table_prices">
+          <tr>
+              <th>Chips</th>
+              <th>Price&#11088;</th>
+              <th>Discount</th>
+              <th>Buy</th>
+          </tr>
+          <tr>
+              <td>5 000</td>
+              <td>120&#11088;</td>
+              <td>-</td>
+              <td id="buy_5000" hx-post="/videopoker/createInvoiceLink/" hx-target="#url_request" hx-trigger="click" style="cursor: pointer;">Buy &#128722;</td>
+          </tr>
+          <tr>
+              <td>10 000</td>
+              <td>228&#11088;</td>
+              <td>5%</td>
+              <td id="buy_10000" hx-post="/videopoker/createInvoiceLink/" hx-target="#url_request" hx-trigger="click" style="cursor: pointer;">Buy &#128722;</td>
+          </tr>
+          <tr>
+              <td>20 000</td>
+              <td>432&#11088;</td>
+              <td>10%</td>
+              <td id="buy_20000" hx-post="/videopoker/createInvoiceLink/" hx-target="#url_request" hx-trigger="click" style="cursor: pointer;">Buy &#128722;</td>
+          </tr>
+          <tr>
+              <td>40 000</td>
+              <td>816&#11088;</td>
+              <td>15%</td>
+              <td id="buy_40000" hx-post="/videopoker/createInvoiceLink/" hx-target="#url_request" hx-trigger="click" style="cursor: pointer;">Buy &#128722;</td>
+          </tr>
+          <tr>
+              <td>80 000</td>
+              <td>1536&#11088;</td>
+              <td>20%</td>
+              <td id="buy_80000" hx-post="/videopoker/createInvoiceLink/" hx-target="#url_request" hx-trigger="click" style="cursor: pointer;">Buy &#128722;</td>
+          </tr>
+          </table>
+
+          </div>
+          <input type="hidden" name="amount" id="amount" value="0">
+          <div id="url_request"></div>
+      </form>
+  
+      
+  </div>
+</div>
 
 
 
 <script>
   
   document.body.addEventListener('htmx:afterSettle', function (evt) {
+
+    // Added.
+    if (evt.detail.target.id == 'url_request') {
+      console.log(evt.detail.target.id);
+    var ok =  document.getElementById('ok').value;
+        if (ok == 'True') {
+            // Payment link is successfully created. Opening Invoice link.
+            var result_url =  document.getElementById('result').value;
+            window.Telegram.WebApp.openInvoice(result_url);
+        }
+      }
+    // Ended
 
     var elements = document.getElementsByClassName("held-caption");
 
@@ -201,6 +271,11 @@
 
   //Flipping cards before the draw and return to normal place after the hold animation.
   document.body.addEventListener('htmx:confirm', function (evt) {
+
+    if (evt.detail.target.id == 'url_request') {
+      return;
+    }
+
     var deal_button = document.getElementById("deal_button");
     deal_button.setAttribute('DISABLED', true); // Disabling Deal button until the cards are dealt.
 
@@ -227,21 +302,9 @@
   });
 
 
-  // const event = new Event('htmx:afterSettle');
-
-  // Dispatching event at initial load.
-  // document.body.dispatchEvent(event);
-
-
   var bet_multiplier = 1;
   document.getElementById("col_" + bet_multiplier).classList.add('bet_selected');
 
-  // window.onload = function () {
-  //   // Your code here
-  //   for (let i = 1; i <= 5; i++) {
-  //     document.getElementById("card_" + i).classList.add('flip-animation');
-  //   }
-  // };
 
   function hold_card(card_clicked, id) {
     var dealt = document.getElementById("dealt").value;
@@ -273,5 +336,48 @@
     document.getElementById("bet_m").value = bet_multiplier;
   }
 
+  document.body.addEventListener('htmx:configRequest', function (evt) {
+
+    
+    if (evt.detail.target.id != 'url_request') {
+      return;
+    }
+        var elem =  evt.detail.elt.id;
+        var formData = evt.detail.parameters;
+        
+        switch (elem) {
+            case 'buy_5000':
+                document.getElementById('amount').value = 5000;
+                formData['amount'] = 5000;
+                break;
+            case 'buy_10000':
+                document.getElementById('amount').value = 10000;
+                formData['amount'] = 10000;
+                break;
+            case 'buy_20000':
+                document.getElementById('amount').value = 20000;
+                formData['amount'] = 20000;
+                break;
+            case 'buy_40000':
+                document.getElementById('amount').value = 40000;
+                formData['amount'] = 40000;
+                break;
+            case 'buy_80000':
+                document.getElementById('amount').value = 80000;
+                formData['amount'] = 80000;
+                break;
+        }
+    });
+
+    function show_modal() {
+        var modal = document.querySelector('.modal-backdrop');
+        modal.style.display = 'block';
+    }
+
+    function hide_modal(evt) {
+        console.log(evt);
+        var modal = document.querySelector('.modal-backdrop');
+        modal.style.display = 'none';
+    }
 </script>
 {% endblock %}

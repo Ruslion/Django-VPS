@@ -52,16 +52,20 @@ async def precheckout_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     try:
         payload = json.loads(query.invoice_payload)
     except ValueError as err:
-        await query.answer(ok=False, error_message="Payload is not correct. JSON format is incorrect.")
+        await query.answer(ok=False, error_message="Sorry! Payload is not correct. JSON format is incorrect.")
         return
     
     payload_keys = ['telegram_id', 'amount', 'price']
 
     for k in payload_keys:
         if k not in payload.keys():
-            await query.answer(ok=False, error_message="Payload is not correct. Key value error.")
+            await query.answer(ok=False, error_message="Sorry! Payload is not correct. Key value error.")
             return
     
+    if payload['telegram_id'] == "0":
+        await query.answer(ok=False, error_message="Sorry! Telegram Id is not recognized.")
+        return
+
     await query.answer(ok=True)
         
 

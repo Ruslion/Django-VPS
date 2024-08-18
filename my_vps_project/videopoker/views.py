@@ -6,6 +6,7 @@ from django.http import JsonResponse
 import os
 import json
 from datetime import datetime, timedelta
+import requests
 
 
 TEL_TOKEN = os.environ['TEL_TOKEN']
@@ -22,13 +23,13 @@ HELD_VALUES = [16, 8, 4, 2, 1] # Held values are used to encode/decode the held 
 
 # Combinations IDs as in database.
 COMBINATIONS_ID = {'Royal Flush':10, 'Straight Flush':9, 'Four of a Kind':8, 'Full House':7,
-                   'Flush':6, 'Straight':5, 'Three of a Kind':4, 'Two pairs':3, 'Tens or Better':2,'No value':1}
+                   'Flush':6, 'Straight':5, 'Three of a Kind':4, 'Two pairs':3, 'Jacks or Better':2,'No value':1}
 # Combinations winning factor
 COMBINATIONS_FACTOR = {'Royal Flush':250, 'Straight Flush':50, 'Four of a Kind':25, 'Full House':9,
-                   'Flush':6, 'Straight':4, 'Three of a Kind':3, 'Two pairs':2, 'Tens or Better':1,'No value':0}
+                   'Flush':6, 'Straight':4, 'Three of a Kind':3, 'Two pairs':2, 'Jacks or Better':1,'No value':0}
 
 # The following dictionary is used for invoice creation. The keys: amount of chips to be bought, the value is the price in stars.
-AMOUNT_DICT = {'5000':'10',
+AMOUNT_DICT = {'5000':'120',
                     '10000':'228',
                     '20000':'432',
                     '40000':'816',
@@ -334,7 +335,7 @@ def createInvoiceLink(request):
     # This function returns InvoiceLink for payment.
     if request.method == "GET":
         # Request method GET. Returning nothing.
-        return JsonResponse ({"ok":false,"result":"failed"})
+        return JsonResponse ({"ok":False,"result":"Get method detected. Failed"})
     
     if request.method == "POST":
 
@@ -345,7 +346,7 @@ def createInvoiceLink(request):
             url_begin = 'https://api.telegram.org/bot'
             method_name = '/createInvoiceLink'
             url_final = url_begin + TEL_TOKEN + method_name
-            payload = {'telegram_id':request.session.get('telegram_id','0'),
+            payload = {'telegram_id':request.session.get('telegram_id', '0'),
                         'amount':amount_to_buy,
                         'price':AMOUNT_DICT[amount_to_buy]}
             # Creating params based on the data from POST method
@@ -353,9 +354,10 @@ def createInvoiceLink(request):
                 'title': amount_to_buy + ' chips',
                 'payload': json.dumps(payload),
                 'currency': 'XTR',
-                'prices': '[{"label":' + amount_to_buy + ' chips","amount":' + AMOUNT_DICT[amount_to_buy] +'}]',
+                'prices': '[{"label":"' + amount_to_buy + ' chips","amount":' + AMOUNT_DICT[amount_to_buy] +'}]',
                 'photo_url': 'https://pychampion.site/static/videopoker/chips.png'
                 }
+            
             result = requests.get(url_final, params=params)
             context = json.loads(result.text)
             if 'result' not in context.keys():
@@ -365,7 +367,7 @@ def createInvoiceLink(request):
             return render(request, "videopoker/invoiceLink.html", context)
         else:
             # invalid amount
-            return JsonResponse ({"ok":false,"result":"failed"})
+            return JsonResponse ({"ok":False,"result":"Invalid amount. Failed"})
         
 
 

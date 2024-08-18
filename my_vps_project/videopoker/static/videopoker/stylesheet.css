@@ -234,3 +234,66 @@ div.buttons, div.balance {
   .red {
     color:red;
   }
+
+  
+.modal-backdrop {
+  display: none;
+  position: fixed; 
+  z-index: 1; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.4);
+  
+}
+.close {
+  color: var(--base-color);
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 2px 2px 2px var(--base-color);
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-content {
+  box-shadow: 5px 5px 5px var(--fifth-color);
+  border-radius: 10px;
+  background-color: var(--fifth-color);
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 5px 20px;
+  border: 3px solid var(--sixth-color);
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.table_prices {
+  margin:20px auto;
+  border:2px solid var(--forth-color);
+  border-radius: 10px;
+  background-color: var(--base-color);
+  color:var(--third-color);
+  box-shadow: 5px 5px 5px var(--base-color);
+  
+}
+.table_prices > tbody > tr > th {
+  width:fit-content;
+}
+
+.table_prices > tbody > tr {
+  border: 1px solid var(--second-color);
+  margin: 5px 5px 5px 5px;
+  
+}
+.table_prices > tbody > tr > td {
+  width: fit-content;
+  padding: 5px;
+  border-color: var(--second-color);
+  text-align: center;
+}
