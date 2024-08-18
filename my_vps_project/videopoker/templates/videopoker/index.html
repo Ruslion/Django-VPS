@@ -344,7 +344,7 @@
     }
         var elem =  evt.detail.elt.id;
         var formData = evt.detail.parameters;
-        
+        hide_modal();
         switch (elem) {
             case 'buy_5000':
                 document.getElementById('amount').value = 5000;
@@ -375,7 +375,7 @@
     }
 
     function hide_modal(evt) {
-        console.log(evt);
+        
         var modal = document.querySelector('.modal-backdrop');
         modal.style.display = 'none';
     }
