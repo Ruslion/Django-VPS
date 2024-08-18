@@ -10,6 +10,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 
 from helpers import database_connect
 import json
+from datetime import datetime
 
 # Enable logging
 logging.basicConfig(
@@ -83,7 +84,26 @@ async def successful_payment_callback(update: Update, context: ContextTypes.DEFA
     balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s WHERE telegram_id = %s RETURNING balance;'''
     result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (amount, telegram_id))
 
-    # do something after successfully receiving payment?
+    # Saving successful transaction to the SuccessfulPayment table.
+
+    saving_transaction_sql = '''INSERT INTO videopoker_successfulpayment (date_time, currency, total_amount, chips_bought,
+                                telegram_id, telegram_payment_charge_id, provider_payment_charge_id)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;
+    '''
+
+    date_time = datetime.now()
+    currency = payment.currency
+    total_amount = payment.total_amount
+    chips_bought = amount
+    # telegram_id is already known
+    telegram_payment_charge_id = payment.telegram_payment_charge_id
+    provider_payment_charge_id = payment.provider_payment_charge_id
+
+    result_transaction = database_connect.execute_insert_update_sql(saving_transaction_sql, (date_time, currency,  total_amount,
+                                                    chips_bought, telegram_id, telegram_payment_charge_id, provider_payment_charge_id
+                                                    ))
+
+
     await update.message.reply_text(f"Thank you for your payment! Your balance has been replenished by {amount} chips.")
 
 ##############################################################################
