@@ -143,12 +143,10 @@
       <form>
           {% csrf_token %}
           <div class="close" onclick="hide_modal()">&#10006;</div>
+          <br>
+          <br>
           
           <div style="display:flex;">
-              <!-- <img src="{% static 'videopoker/chips.png' %}" style="max-width:10vw;margin:auto;"> -->
-              
-
-
           <table class = "table_prices">
           <tr>
               <th>Chips</th>
@@ -189,6 +187,12 @@
           </table>
 
           </div>
+          <div style="display: grid;">
+          <span style="text-align:center">You may get extra 2000 chips for FREE as soon as your friend registered</span>
+          <br>
+          
+          <a onclick="share()" href="" style="color:var(--second-color);text-align:center;">Share with friend</a>
+        </div>
           <input type="hidden" name="amount" id="amount" value="0">
           <div id="url_request"></div>
       </form>
@@ -275,7 +279,7 @@
     if (evt.detail.target.id == 'url_request') {
       return;
     }
-
+    
     var deal_button = document.getElementById("deal_button");
     deal_button.setAttribute('DISABLED', true); // Disabling Deal button until the cards are dealt.
 
@@ -378,6 +382,11 @@
         
         var modal = document.querySelector('.modal-backdrop');
         modal.style.display = 'none';
+    }
+
+    function share() {
+      var tel = window.Telegram.WebApp;
+      tel.openLink('https://t.me/share/url?url=https://t.me/VideoPokerMiniAppBot?startapp=refr_id{{user_id}}');
     }
 </script>
 {% endblock %}

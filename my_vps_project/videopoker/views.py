@@ -66,17 +66,36 @@ def index(request):
 
     # Below for the cases when session variable 'telegram_id' not specified yet
     if request.method == "GET":
-        # Access for myself
-        if request.GET.get('password', 'not_found') == '438763601':
-            request.session['telegram_id'] = 438763601
-            telegram_id = 438763601
+        # Access if telegram_id variable is already in the session.
+        telegram_id = request.session.get('telegram_id', False)
+        if telegram_id:
+            # Telegram id found in session variable.
+            # Verifying record in database.
             result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
-            EMPTY_CONTEXT['balance'] = result_balance[0][0]
-            request.session['balance'] = result_balance[0][0]
-            request.session['user_id'] = result_balance[0][1]
-            return render(request, "videopoker/index.html", EMPTY_CONTEXT)
+            if result_balance: # Record in database found
+                EMPTY_CONTEXT['balance'] = result_balance[0][0]
+                EMPTY_CONTEXT['user_id'] = result_balance[0][1]
+                request.session['balance'] = result_balance[0][0]
+                request.session['user_id'] = result_balance[0][1]
+                return render(request, "videopoker/index.html", EMPTY_CONTEXT)
 
-        # Probably user is not logged in yet
+        # Probably user is not logged in yet.
+        # Verifying whether it was reference link.
+        reference = request.GET.get('tgWebAppStartParam', None)
+        if reference:
+            # Reference link. Processing.
+            if reference[:7] == 'refr_id':
+                # Seems to be valid
+                refr_id = reference[7:]
+                try:
+                    user_id = int(refr_id)
+                except ValueError:
+                    refr_id = None
+                if refr_id:
+                    # Saving ref_user_id in session for future use.
+                    request.session['ref_user_id'] = refr_id
+
+
         # Sending to login page
         return render(request, "videopoker/login.html")
     # If POST request but no session 'telegram_id' varialbe
@@ -113,15 +132,25 @@ def index(request):
                 '''
                 is_premium = user_data.get('is_premium', False)
                 photo_url = user_data.get('photo_url', False)
+                username = user_data.get('username', 'No_user_name')
 
-                data_tuple = (user_data['id'], user_data['first_name'], user_data['last_name'], user_data['username'],
+                data_tuple = (user_data['id'], user_data['first_name'], user_data['last_name'], username,
                             user_data['language_code'], user_data['allows_write_to_pm'], is_premium, photo_url,
                             INITIAL_CHIPS_AMOUNT)
                 result = database_connect.execute_insert_update_sql(insert_user_sql, data_tuple)
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance']  = INITIAL_CHIPS_AMOUNT
+                EMPTY_CONTEXT['user_id'] = result[0]
                 request.session['balance'] = INITIAL_CHIPS_AMOUNT
                 request.session['user_id'] = result[0]
+
+                # Updating referal balance
+                ref_user_id = request.session.get('ref_user_id', None)
+                if ref_user_id:
+                    balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s WHERE id = %s RETURNING balance;'''
+                    result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (2000, ref_user_id))
+                    del request.session['ref_user_id']
+                    request.session.modified = True
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
                 
         else:
@@ -217,6 +246,7 @@ def deal(request):
                 context = get_context(current_bet, telegram_id)
             else:
                 # Current bet is higher than balance
+                request.session['dealt'] = False
                 return render(request, "videopoker/deal.html", CLOWN_CONTEXT)
 
             
@@ -237,8 +267,8 @@ def leaderboard(request):
     # Selecting leaders for the previous day
     select_leaders_sql = '''SELECT username, SUM(win_amount) AS win from videopoker_hands_dealt hd 
                             JOIN videopoker_users u ON u.id = hd.user_id_id
-                            WHERE hd.date_time = CURRENT_DATE - 1
-                            GROUP BY username
+                            WHERE hd.date_time = CURRENT_DATE
+                            GROUP BY username, u.id
                             ORDER by win DESC 
                             LIMIT 100;'''
     result_leaders = database_connect.execute_select_sql(select_leaders_sql, None)
@@ -281,12 +311,12 @@ def leaders(request):
                             # AND u.language_code LIKE %s
                             
 
-    select_leaders_sql_ending = ''' GROUP BY username
-                            ORDER by win DESC 
+    select_leaders_sql_ending = ''' GROUP BY username, u.id
+                            ORDER by win DESC, username
                             LIMIT 100;'''
     match filter_for_sql:
         case 'day':
-            filter_for_sql = 'hd.date_time = CURRENT_DATE - 1'
+            filter_for_sql = 'hd.date_time = CURRENT_DATE'
         case 'week':
             # Need to calculate the dates for the previous week
             today = datetime.today().date()

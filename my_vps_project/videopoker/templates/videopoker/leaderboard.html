@@ -13,9 +13,9 @@
 <form>     {% csrf_token %}
 <table class="leaderboard">
     <tr>
-        <th id="day" class="selected_filter" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Day</th>
-        <th id="week" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Week</th>
-        <th id="month" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Month</th>
+        <th id="day" class="selected_filter" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Today</th>
+        <th id="week" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Last Week</th>
+        <th id="month" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Last Month</th>
         <th id="all-time" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">All-time</th>
         <th id="locale">
             Locale

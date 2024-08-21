@@ -1,7 +1,7 @@
 from django.db import models
 
 class Users(models.Model):
-    username = models.CharField(max_length=500)
+    username = models.CharField(max_length=500, blank=True)
     telegram_id = models.PositiveBigIntegerField(blank=True)
     first_name = models.CharField(max_length=200, blank=True)
     last_name = models.CharField(max_length=200, blank=True)
