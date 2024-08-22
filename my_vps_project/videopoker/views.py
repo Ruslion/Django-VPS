@@ -12,13 +12,15 @@ import requests
 TEL_TOKEN = os.environ['TEL_TOKEN']
 INITIAL_CHIPS_AMOUNT = 5000 # The amount given at registration.
 BET_MIN = 100 # The minimum amount of chips bet.
-EMPTY_CONTEXT = {'drawn_cards': [1, 2, 3, 4, 5]} # Empty context is used as placeholder for the first call of the index page.
+EMPTY_CONTEXT = {'drawn_cards': [1, 2, 3, 4, 5],
+                'dealt':False} # Empty context is used as placeholder for the first call of the index page.
 CLOWN_CONTEXT = {'drawn_cards': [[u"\U0001F921", ''], # Clown face emoji. This context is used when someone messes with the client's post form.
                                 [u"\U0001F921", ''],
                                 [u"\U0001F921", ''],
                                 [u"\U0001F921", ''],
                                 [u"\U0001F921", '']
-                                ]}
+                                ],
+                'dealt':False}
 HELD_VALUES = [16, 8, 4, 2, 1] # Held values are used to encode/decode the held cards from client's side.
 
 # Combinations IDs as in database.
@@ -77,6 +79,7 @@ def index(request):
                 EMPTY_CONTEXT['user_id'] = result_balance[0][1]
                 request.session['balance'] = result_balance[0][0]
                 request.session['user_id'] = result_balance[0][1]
+                request.session['win_value'] = 0
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
 
         # Probably user is not logged in yet.
@@ -217,6 +220,7 @@ def deal(request):
                 winning_value = 0
                 context['balance'] = request.session['balance']
 
+            request.session['win_value'] = winning_value
 
             # Saving hand into database.
             saving_hand_sql = '''INSERT INTO videopoker_Hands_dealt (user_id_id, date_time, bet_multiplier, initial_hand,
@@ -257,7 +261,7 @@ def deal(request):
                 if 'T' in card_list[0]:
                     card_list[0] = '10' + card_list[0][1:]
             
-            
+            context['win_value'] = request.session.get('win_value', 0)
             return render(request, "videopoker/deal.html", context)
 
     if request.method == "GET": # Returning NO ACCESS list of string if accessed via GET method.

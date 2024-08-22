@@ -32,6 +32,10 @@ span {
   
 }
 
+span#info {
+  visibility:hidden;
+}
+
 select {
   font-size:medium;
   color:var(--third-color);

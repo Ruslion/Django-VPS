@@ -26,7 +26,7 @@ SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 SECRET_KEY_FALLBACKS = ['django-insecure-zk4iob5p+*a2o5a8p)9h@6*l&yu_wmma&7w_ol)r9o%1kn8*3i']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
 CSRF_COOKIE_SECURE = True
