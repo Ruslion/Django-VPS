@@ -48,6 +48,10 @@ class All_Time_stats(models.Model):
     jacks_or_better = models.PositiveBigIntegerField()
     no_value_hand = models.PositiveBigIntegerField()
 
+class Suggestions(models.Model):
+    telegram_id = models.PositiveBigIntegerField(blank=True)
+    suggestion = models.CharField(max_length=212)
+
 
 
 

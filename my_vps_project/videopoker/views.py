@@ -76,7 +76,7 @@ def index(request):
             result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
             if result_balance: # Record in database found
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
-                EMPTY_CONTEXT['user_id'] = result_balance[0][1]
+                EMPTY_CONTEXT['telegram_id'] = telegram_id
                 request.session['balance'] = result_balance[0][0]
                 request.session['user_id'] = result_balance[0][1]
                 request.session['win_value'] = 0
@@ -84,6 +84,7 @@ def index(request):
 
         # Probably user is not logged in yet.
         # Verifying whether it was reference link.
+        
         reference = request.GET.get('tgWebAppStartParam', None)
         if reference:
             # Reference link. Processing.
@@ -123,6 +124,7 @@ def index(request):
                 # The record is in database
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
+                EMPTY_CONTEXT['telegram_id'] = telegram_id
                 request.session['balance'] = result_balance[0][0]
                 request.session['user_id'] = result_balance[0][1]
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
@@ -143,14 +145,14 @@ def index(request):
                 result = database_connect.execute_insert_update_sql(insert_user_sql, data_tuple)
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance']  = INITIAL_CHIPS_AMOUNT
-                EMPTY_CONTEXT['user_id'] = result[0]
+                EMPTY_CONTEXT['telegram_id'] = telegram_id
                 request.session['balance'] = INITIAL_CHIPS_AMOUNT
                 request.session['user_id'] = result[0]
 
                 # Updating referal balance
                 ref_user_id = request.session.get('ref_user_id', None)
                 if ref_user_id:
-                    balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s WHERE id = %s RETURNING balance;'''
+                    balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s WHERE telegram_id = %s RETURNING balance;'''
                     result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (2000, ref_user_id))
                     del request.session['ref_user_id']
                     request.session.modified = True
@@ -269,9 +271,9 @@ def deal(request):
 
 def leaderboard(request):
     # Selecting leaders for the previous day
-    select_leaders_sql = '''SELECT username, SUM(win_amount) AS win from videopoker_hands_dealt hd 
+    select_leaders_sql = '''SELECT username, first_name, SUM(win_amount) AS win from videopoker_hands_dealt hd 
                             JOIN videopoker_users u ON u.id = hd.user_id_id
-                            WHERE hd.date_time = CURRENT_DATE
+                            WHERE hd.date_time = CURRENT_DATE AND hd.win_amount > 0
                             GROUP BY username, u.id
                             ORDER by win DESC 
                             LIMIT 100;'''
@@ -309,9 +311,9 @@ def leaders(request):
     filter_for_sql = request.POST.get('filter', None)
     filter_loc_for_sql = request.POST.get('locale_filter', None)
 
-    select_leaders_sql = '''SELECT username, SUM(win_amount) AS win from videopoker_hands_dealt hd 
+    select_leaders_sql = '''SELECT username, first_name, SUM(win_amount) AS win from videopoker_hands_dealt hd 
                             JOIN videopoker_users u ON u.id = hd.user_id_id
-                            WHERE '''
+                            WHERE hd.win_amount > 0 AND '''
                             # AND u.language_code LIKE %s
                             
 

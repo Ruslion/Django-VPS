@@ -17,6 +17,7 @@ body {
 
 th {
   width: 20%;
+  font-size: medium;
 }
 
 h2 {
@@ -24,6 +25,7 @@ h2 {
   width:fit-content;
   max-width: 70vw;
   color: var(--third-color);
+  text-align: center;
 }
 
 span {
@@ -66,7 +68,7 @@ select {
   border:3px solid;
   border-color:var(--fifth-color); 
   margin:auto; 
-  font-size:medium;
+  font-size:small;
   color:var(--third-color);
   text-align: center;
 }

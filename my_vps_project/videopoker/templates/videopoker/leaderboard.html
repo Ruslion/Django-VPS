@@ -6,7 +6,7 @@
     <div class="title">
         
             
-    <a  href="/videopoker/"  style="text-decoration: none;"><span style="font-size:xxx-large">&#8656;</span></a><h2>Leaderboard</h2>
+    <a  href="/videopoker/"  style="text-decoration: none;"><span style="font-size:xxx-large">&#8656;</span></a><h2>Leaderboard<br>Top 100</h2>
         
     </div>
     <div>Server time: {{server_time}}</div>
@@ -30,11 +30,12 @@
 <br>
 <table class="leaderboard" id="leaderboard_table">
     
-    <tr><td >Rank</td><td >Username</td><td>Amount Won</td></tr>
-    {% for username, won in leaders%}
+    <tr><th>#</th><th>Username</th><th>First Name</th><th>Amount Won</th></tr>
+    {% for username, first_name, won in leaders%}
     <tr>
         <td>{{forloop.counter}}</td>
         <td>{{username}}</td>
+        <td>{{first_name}}</td>
         <td>{{won}}</td>
     </tr>
     {% endfor %}

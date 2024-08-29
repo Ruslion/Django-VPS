@@ -31,19 +31,36 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     await update.message.reply_html(
-        rf"Hi {user.mention_html()}! This bot and mini app is still in development. Please stay with us. Thank you!",
-        reply_markup=ForceReply(selective=True),
+        rf"Hi {user.mention_html()}! Welcome to our application. Have fun and play video poker!",
+        # reply_markup=ForceReply(selective=True),
     )
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
-    await update.message.reply_text("Hello! This bot and mini app is still in development. Please stay with us. Thank you!")
+    await update.message.reply_text("""The goal of a video poker game is to create the best possible five-card poker hand after a single draw,
+    aiming to match winning combinations listed in the game's paytable to win a payout. Playing chips are used to place a bet. 
+    Playing chips cannot be converted, sold, gifted or used elsewhere but this application. Any suggestions to the application can be sent
+    to the developers in a message to this bot with 'Suggestion:' prefix. Please limit your suggestions to 200 symbols.
+    """)
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
-    await update.message.reply_text(update.message.text)
+    reply_text = "Have fun! :) - autoreply."
+    user_id = int(update.effective_user.id)
+    message = update.message.text
+    if message[:11] == 'Suggestion:':
+        # Suggestion received.
+        message = message[11:] # Deleting prefix
+        message = message[:200] # Trimming string
+        suggestion_sql = '''INSERT INTO videopoker_suggestions (telegram_id, suggestion)
+                        VALUES (%s, %s) RETURNING id;
+        '''
+        result_suggestion = database_connect.execute_insert_update_sql(suggestion_sql, (user_id,message))
+        reply_text = 'Thank you for your suggestion!'
+
+    await update.message.reply_text(reply_text)
 
 # after (optional) shipping, it's the pre-checkout
 async def precheckout_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

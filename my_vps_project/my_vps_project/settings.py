@@ -93,6 +93,7 @@ POSTGRES_PASSWORD = os.environ['POSTGRES_PASSWORD']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        'PORT':6432,
         'HOST': 'localhost',
         'NAME': 'postgres',
         'USER': POSTGRES_USER,
