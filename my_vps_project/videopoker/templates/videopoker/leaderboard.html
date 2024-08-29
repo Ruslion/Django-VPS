@@ -30,7 +30,11 @@
 <br>
 <table class="leaderboard" id="leaderboard_table">
     
-    <tr><th>#</th><th>Username</th><th>First Name</th><th>Amount Won</th></tr>
+    <tr><td style="font-size: medium;">#</td>
+        <td style="font-size: medium;">Username</td>
+        <td style="font-size: medium;">First Name</td>
+        <td style="font-size: medium;">Amount Won</td>
+    </tr>
     {% for username, first_name, won in leaders%}
     <tr>
         <td>{{forloop.counter}}</td>
