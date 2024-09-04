@@ -31,15 +31,15 @@
 <table class="leaderboard" id="leaderboard_table">
     
     <tr><td style="font-size: medium;">#</td>
-        <td style="font-size: medium;">Username</td>
         <td style="font-size: medium;">First Name</td>
+        <td style="font-size: medium;">Last Name</td>
         <td style="font-size: medium;">Amount Won</td>
     </tr>
-    {% for username, first_name, won in leaders%}
+    {% for first_name, last_name, won in leaders%}
     <tr>
         <td>{{forloop.counter}}</td>
-        <td>{{username}}</td>
         <td>{{first_name}}</td>
+        <td>{{last_name}}</td>
         <td>{{won}}</td>
     </tr>
     {% endfor %}
