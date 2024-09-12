@@ -56,7 +56,7 @@ select {
   width:100%;
   border:3px solid;
   border-color:var(--fifth-color); 
-  margin:auto; 
+  margin:10px auto; 
   font-size:medium;
   color:var(--third-color);
   text-align: left;
@@ -111,6 +111,11 @@ div.buttons, div.balance {
   display: flex;
 }
 
+.menu_button {
+  border-radius: 6px;
+  background: none;
+  margin: auto 5px;
+}
 
 .button {
   align-items: center;
@@ -131,7 +136,7 @@ div.buttons, div.balance {
   overflow: hidden;
   padding-left: 16px;
   padding-right: 16px;
-  margin:auto;
+  margin: 10px auto;
   position: relative;
   text-align: left;
   text-decoration: none;
@@ -149,7 +154,7 @@ div.buttons, div.balance {
   box-shadow: var(--sixth-color) 0 0 0 1.5px inset, rgba(45, 35, 66, .4) 0 2px 4px, rgba(45, 35, 66, .3) 0 7px 13px -3px, var(--sixth-color) 0 -3px 0 inset;
 }
 .button:hover {
-  box-shadow: rgba(45, 35, 66, .4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, var(--sixth-color) 0 -3px 0 inset;
+  /* box-shadow: rgba(45, 35, 66, .4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, var(--sixth-color) 0 -3px 0 inset; */
   transform: translateY(-2px);
 }
 .button:active {

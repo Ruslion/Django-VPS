@@ -4,10 +4,10 @@
 {% block content %}
 <div class="title">
   <h2>Jacks or better</h2>
-  <a  href="/videopoker/leaderboard/"><img style="max-width:10vw;" src="{% static 'videopoker/ladder.png' %}" title="Leaderboard"></a>
-  <img style="max-width: 10vw;cursor:pointer;" src="{% static 'videopoker/chips.png' %}" onclick="show_modal()">
+  <a  href="/videopoker/leaderboard/"><button class="menu_button"><img style="max-width:10vw;" src="{% static 'videopoker/ladder.png' %}" title="Leaderboard"></button></a>
+  <button class="menu_button" onclick="show_modal()"><img style="max-width: 10vw;cursor:pointer;" src="{% static 'videopoker/chips.png' %}"></button>
 </div>
-<div >
+<div>
   <table class="multiplier_table">  
     <colgroup>
       <col id="col_0">
