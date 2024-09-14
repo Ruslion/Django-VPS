@@ -3,9 +3,9 @@
     <td style="font-size: medium;">Last Name</td>
     <td style="font-size: medium;">Amount Won</td>
 </tr>
-{% for first_name, last_name, won in leaders%}
-<tr>
-    <td>{{forloop.counter}}</td>
+{% for telegram_id, first_name, last_name, won in leaders%}
+<tr {% if telegram_id == tel_id %}class="row_combination"{% endif %}>
+    <td >{{forloop.counter}}</td>
     <td>{{first_name}}</td>
     <td>{{last_name}}</td>
     <td>{{won}}</td>

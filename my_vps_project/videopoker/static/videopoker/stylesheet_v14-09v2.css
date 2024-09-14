@@ -237,6 +237,7 @@ div.buttons, div.balance {
   .row_combination {
     background-color: var(--second-color) !important;
     color:var(--fourth-color);
+    font-weight: bold;
   }
   tr:nth-child(even) {
     background-color: var(--fourth-color);

@@ -271,7 +271,7 @@ def deal(request):
 
 def leaderboard(request):
     # Selecting leaders for the previous day
-    select_leaders_sql = '''SELECT first_name, last_name, SUM(win_amount) AS win from videopoker_hands_dealt hd 
+    select_leaders_sql = '''SELECT telegram_id, first_name, last_name, SUM(win_amount) AS win from videopoker_hands_dealt hd 
                             JOIN videopoker_users u ON u.id = hd.user_id_id
                             WHERE hd.date_time = CURRENT_DATE AND hd.win_amount > 0
                             GROUP BY u.id
@@ -287,7 +287,8 @@ def leaderboard(request):
     result_locale = database_connect.execute_select_sql(select_locale_sql, None)
     context = {'leaders':result_leaders,
                 'locale':[l[0] for l in result_locale],
-                'server_time':datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                'server_time':datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'tel_id': request.session['telegram_id']
             }
     
     request.session['locale'] = context['locale']
@@ -311,7 +312,7 @@ def leaders(request):
     filter_for_sql = request.POST.get('filter', None)
     filter_loc_for_sql = request.POST.get('locale_filter', None)
 
-    select_leaders_sql = '''SELECT first_name, last_name, SUM(win_amount) AS win from videopoker_hands_dealt hd 
+    select_leaders_sql = '''SELECT telegram_id, first_name, last_name, SUM(win_amount) AS win from videopoker_hands_dealt hd 
                             JOIN videopoker_users u ON u.id = hd.user_id_id
                             WHERE hd.win_amount > 0 AND '''
                             # AND u.language_code LIKE %s
@@ -364,7 +365,8 @@ def leaders(request):
     select_leaders_sql = select_leaders_sql + filter_for_sql + filter_loc_for_sql + select_leaders_sql_ending
 
     result_leaders = database_connect.execute_select_sql(select_leaders_sql, None)
-    context = {'leaders':result_leaders}
+    context = {'leaders':result_leaders,
+            'tel_id': request.session['telegram_id']}
     return render(request, "videopoker/leaders.html", context)
 
 def createInvoiceLink(request):
