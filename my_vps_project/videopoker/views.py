@@ -282,7 +282,8 @@ def leaderboard(request):
     
 
     select_locale_sql = '''SELECT language_code FROM videopoker_users
-                            GROUP BY language_code;
+                            GROUP BY language_code
+                            ORDER by language_code;
                         '''
     result_locale = database_connect.execute_select_sql(select_locale_sql, None)
     context = {'leaders':result_leaders,

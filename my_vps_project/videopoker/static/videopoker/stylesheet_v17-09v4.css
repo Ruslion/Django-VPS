@@ -73,6 +73,10 @@ select {
   text-align: center;
 }
 
+.leaderboard > tr > td {
+  /* word-break: break-word; */
+  max-width: 35vw;
+}
 .hold_animation {
   animation: scale_down_up 0.2s ease-out forwards; 
   /* transition: transform 0.2s ease-out; */
