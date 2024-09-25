@@ -31,7 +31,7 @@ class AsyncRateLimitedRequester:
         await asyncio.gather(*tasks)
 
 async def main():
-    requester = AsyncRateLimitedRequester(rate_limit=30)
+    requester = AsyncRateLimitedRequester(rate_limit=25)
     url_begin = 'https://api.telegram.org/bot'
     token = os.environ['TEL_TOKEN']
     method_name = '/sendMessage'

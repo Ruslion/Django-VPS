@@ -216,6 +216,7 @@ div.buttons, div.balance {
     -webkit-backface-visibility: hidden; /* Safari */
     backface-visibility: hidden;
     border-radius: 10px;
+    box-shadow: 2px 2px dimgray;
   }
   
   /* Style the front side (fallback if image is missing) */
@@ -253,7 +254,7 @@ div.buttons, div.balance {
 
   
 .modal-backdrop {
-  display: none;
+  /* display: none; */
   position: fixed; 
   z-index: 1; 
   left: 0;
@@ -262,8 +263,22 @@ div.buttons, div.balance {
   height: 100%; 
   overflow: auto; 
   background-color: rgba(0,0,0,0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
   
 }
+
+.modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+.modal-backdrop.active .modal-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+
 .close {
   color: var(--second-color);
   float: right;
@@ -280,13 +295,15 @@ div.buttons, div.balance {
 }
 
 .modal-content {
-  box-shadow: 5px 5px 5px var(--fifth-color);
   border-radius: 10px;
   background-color: var(--base-color);
   margin: 20% auto; /* 15% from the top and centered */
   padding: 5px 10px;
   border: 3px solid var(--third-color);
   width: 80vw; /* Could be more or less, depending on screen size */
+  transform: scale(0.7);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .table_prices {

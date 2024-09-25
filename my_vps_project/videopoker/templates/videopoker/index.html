@@ -191,9 +191,8 @@
           </div>
           <div style="display: grid;">
           <span style="text-align:center">You may get extra 2000 chips for FREE as soon as your friend registered</span>
-          <br>
           
-          <a onclick="share()" href="" style="color:var(--second-color);text-align:center;">Share with friend</a>
+          <button class="button" onclick="share()">Share with a friend</button>
         </div>
           <input type="hidden" name="amount" id="amount" value="0">
           <div id="url_request"></div>
@@ -286,12 +285,16 @@
               audio_win.pause();
               audio_win.currentTime = 0;
               audio_win.play();
+              Telegram.WebApp.HapticFeedback.notificationOccurred('success');
             }
 
             else { // Royal flush audio is played.
               audio_win_rf.pause();
               audio_win_rf.currentTime = 0;
               audio_win_rf.play();
+              Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+              Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+              Telegram.WebApp.HapticFeedback.notificationOccurred('success');
             }
             
           }
@@ -418,13 +421,15 @@
 
     function show_modal() {
         var modal = document.querySelector('.modal-backdrop');
-        modal.style.display = 'block';
+        modal.classList.add('active');
+        // modal.style.display = 'block';
     }
 
     function hide_modal(evt) {
         
         var modal = document.querySelector('.modal-backdrop');
-        modal.style.display = 'none';
+        modal.classList.remove('active');
+        // modal.style.display = 'none';
     }
 
     function share() {
