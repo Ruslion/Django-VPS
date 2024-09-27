@@ -8,4 +8,6 @@ urlpatterns = [
     path("leaderboard/", views.leaderboard, name="leaderboard"),
     path("leaders/", views.leaders, name="leaders"),
     path("createInvoiceLink/", views.createInvoiceLink, name="createInvoiceLink"),
+    path("adsgramReward/", views.adsgramReward, name="adsgramReward"),
+    path("update_balance/", views.adsgramReward, name="update_balance"),
 ]

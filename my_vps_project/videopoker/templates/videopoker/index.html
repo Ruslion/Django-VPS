@@ -119,12 +119,12 @@
 
     <input type="hidden" name="held" id="held" value="0">
     <input type="hidden"  id="combination" value="{{combination}}">
-    <input type="hidden"  id="dealt" value="{{dealt}}">
+    <input type="hidden"  id="desalt" value="{{dealt}}">
     <input type="hidden"  id="balance" value="{{balance}}">
     <input type="hidden"  id="win_value" value="0">
     
   </div>
-    <div class="balance"><span>Balance: {{balance}} chips</span>
+    <div class="balance"><span id="span_balance">Balance: {{balance}} chips</span>
 
     </div>
 </div>
@@ -144,7 +144,10 @@
   <div class="modal-content" >
       <form>
           {% csrf_token %}
-          <div class="close" onclick="hide_modal()">&#10006;</div>
+          <div class="close" onclick="hide_modal()" id="hide_modal"
+                hx-get="/videopoker/update_balance?userid={{telegram_id}}" 
+                hx-target="#balance" 
+                hx-swap="outerHTML">&#10006;</div>
           <br>
           <br>
           
@@ -212,7 +215,7 @@
   Telegram.WebApp.onEvent('invoiceClosed', function (object) {
     if (object.status == 'paid') {
       // Invoice is paid. Refreshing the page by dealing the new hand.
-      htmx.trigger("#deal_button", "click");
+      htmx.trigger("#hide_modal", "click");
     }
   });
 
@@ -227,6 +230,7 @@
             // Payment link is successfully created. Opening Invoice link.
             var result_url =  document.getElementById('result').value;
             window.Telegram.WebApp.openInvoice(result_url);
+            return;
         }
       }
     // Ended
@@ -269,7 +273,7 @@
       bet_button.removeAttribute('DISABLED', false);
       deal_button.innerHTML = 'Deal';
       info.innerText = 'Note:';
-        info.style.visibility = 'hidden';
+      info.style.visibility = 'hidden';
     }
 
     if (comb > 1) {
@@ -391,45 +395,30 @@
     
     if (evt.detail.target.id != 'url_request') {
       return;
-    }
+    }   
+        var buy_dict = {'buy_5000': 5000,
+                        'buy_10000': 10000,
+                        'buy_20000': 20000,
+                        'buy_40000': 40000,
+                        'buy_80000': 80000
+        };
+
         var elem =  evt.detail.elt.id;
         var formData = evt.detail.parameters;
         hide_modal();
-        switch (elem) {
-            case 'buy_5000':
-                document.getElementById('amount').value = 5000;
-                formData['amount'] = 5000;
-                break;
-            case 'buy_10000':
-                document.getElementById('amount').value = 10000;
-                formData['amount'] = 10000;
-                break;
-            case 'buy_20000':
-                document.getElementById('amount').value = 20000;
-                formData['amount'] = 20000;
-                break;
-            case 'buy_40000':
-                document.getElementById('amount').value = 40000;
-                formData['amount'] = 40000;
-                break;
-            case 'buy_80000':
-                document.getElementById('amount').value = 80000;
-                formData['amount'] = 80000;
-                break;
-        }
+        document.getElementById('amount').value = buy_dict[elem];
+        formData['amount'] = buy_dict[elem];
     });
 
     function show_modal() {
         var modal = document.querySelector('.modal-backdrop');
         modal.classList.add('active');
-        // modal.style.display = 'block';
     }
 
     function hide_modal(evt) {
         
         var modal = document.querySelector('.modal-backdrop');
         modal.classList.remove('active');
-        // modal.style.display = 'none';
     }
 
     function share() {

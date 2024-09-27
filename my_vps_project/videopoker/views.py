@@ -11,6 +11,8 @@ import requests
 
 TEL_TOKEN = os.environ['TEL_TOKEN']
 INITIAL_CHIPS_AMOUNT = 5000 # The amount given at registration.
+FRIEND_REF_AMOUNT = 2000
+AD_VIEWED_AMOUNT = 100
 BET_MIN = 100 # The minimum amount of chips bet.
 EMPTY_CONTEXT = {'drawn_cards': [1, 2, 3, 4, 5],
                 'dealt':False} # Empty context is used as placeholder for the first call of the index page.
@@ -22,6 +24,8 @@ CLOWN_CONTEXT = {'drawn_cards': [[u"\U0001F921", ''], # Clown face emoji. This c
                                 ],
                 'dealt':False}
 HELD_VALUES = [16, 8, 4, 2, 1] # Held values are used to encode/decode the held cards from client's side.
+
+ADSGRAM_REWARD_KEY = 'Honey2403'
 
 # Combinations IDs as in database.
 COMBINATIONS_ID = {'Royal Flush':10, 'Straight Flush':9, 'Four of a Kind':8, 'Full House':7,
@@ -153,7 +157,7 @@ def index(request):
                 ref_user_id = request.session.get('ref_user_id', None)
                 if ref_user_id:
                     balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s WHERE telegram_id = %s RETURNING balance;'''
-                    result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (2000, ref_user_id))
+                    result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (FRIEND_REF_AMOUNT, ref_user_id))
                     del request.session['ref_user_id']
                     request.session.modified = True
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
@@ -407,11 +411,40 @@ def createInvoiceLink(request):
         else:
             # invalid amount
             return JsonResponse ({"ok":False,"result":"Invalid amount. Failed"})
-        
 
+def adsgramReward(request):
+    if request.method == "GET":
+        # Request method GET. Verifying variables.
+        user_id = request.GET.get('userid', False)
+        key = request.GET.get('key', None)
 
+        if key == ADSGRAM_REWARD_KEY and user_id:
+            # Verifying user_id
+            result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (user_id,))
+            if result_balance: # Record in database found
+                # Updating user's balance
+                balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s WHERE telegram_id = %s RETURNING balance;'''
+                result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (AD_VIEWED_AMOUNT, user_id))
+                return JsonResponse ({"ok":True,"result":"Reward has been accrued."})
+            else:
+                # Record not found in the database
+                return JsonResponse ({"ok":False,"result":"The user_id not found in the database. Failed"})
+        else:
+            # Either key is wrong or user_id not sent with parameters.
+            return JsonResponse ({"ok":False,"result":"Either key is wrong or user_id was not sent. Failed"})
+    else:
+        return JsonResponse ({"ok":False,"result":"Method other than GET detected. Failed"})
 
-
-    
-    
-    
+def update_balance(request):
+    context = {'balance': 0}
+    user_id = request.GET.get('userid', False)
+    if request.method == "GET" and user_id:
+        result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s", (user_id,))
+        if result_balance: # Record in database found
+            context['balance'] = result_balance[0]
+            render(request, "videopoker/update_balance.html", context)
+        else:
+            # Record not found in the database
+            render(request, "videopoker/update_balance.html", context)
+    else:
+        render(request, "videopoker/update_balance.html", context)
