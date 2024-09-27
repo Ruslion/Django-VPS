@@ -435,16 +435,21 @@ def adsgramReward(request):
     else:
         return JsonResponse ({"ok":False,"result":"Method other than GET detected. Failed"})
 
-def update_balance(request):
+def update_balance(request, user_id=None):
     context = {'balance': 0}
-    user_id = request.GET.get('userid', False)
-    if request.method == "GET" and user_id:
-        result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s", (user_id,))
-        if result_balance: # Record in database found
-            context['balance'] = result_balance[0]
-            render(request, "videopoker/update_balance.html", context)
+    
+    if request.method == "GET":
+        if user_id:
+            result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s", (user_id,))
+            if result_balance: # Record in database found
+                context['balance'] = result_balance[0][0]
+                return render(request, "videopoker/update_balance.html", context)
+            else:
+                # Record not found in the database
+                print("Record not found in the database")
+                return render(request, "videopoker/update_balance.html", context)
         else:
-            # Record not found in the database
-            render(request, "videopoker/update_balance.html", context)
+            # user_id parameter not found
+            return render(request, "videopoker/update_balance.html", context)
     else:
-        render(request, "videopoker/update_balance.html", context)
+        return render(request, "videopoker/update_balance.html", context)

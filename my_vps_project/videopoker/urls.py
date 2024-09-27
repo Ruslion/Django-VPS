@@ -9,5 +9,5 @@ urlpatterns = [
     path("leaders/", views.leaders, name="leaders"),
     path("createInvoiceLink/", views.createInvoiceLink, name="createInvoiceLink"),
     path("adsgramReward/", views.adsgramReward, name="adsgramReward"),
-    path("update_balance/", views.adsgramReward, name="update_balance"),
+    path("update_balance/<int:user_id>", views.update_balance, name="update_balance"),
 ]

@@ -119,7 +119,7 @@
 
     <input type="hidden" name="held" id="held" value="0">
     <input type="hidden"  id="combination" value="{{combination}}">
-    <input type="hidden"  id="desalt" value="{{dealt}}">
+    <input type="hidden"  id="dealt" value="{{dealt}}">
     <input type="hidden"  id="balance" value="{{balance}}">
     <input type="hidden"  id="win_value" value="0">
     
@@ -145,9 +145,10 @@
       <form>
           {% csrf_token %}
           <div class="close" onclick="hide_modal()" id="hide_modal"
-                hx-get="/videopoker/update_balance?userid={{telegram_id}}" 
-                hx-target="#balance" 
-                hx-swap="outerHTML">&#10006;</div>
+                hx-get="/videopoker/update_balance/{{telegram_id}}"
+                hx-target="#balance"
+                hx-swap="outerHTML"
+                >&#10006;</div>
           <br>
           <br>
           
@@ -198,6 +199,7 @@
           <button class="button" onclick="share()">Share with a friend</button>
         </div>
           <input type="hidden" name="amount" id="amount" value="0">
+          
           <div id="url_request"></div>
       </form>
   
@@ -223,17 +225,22 @@
 
   document.body.addEventListener('htmx:afterSettle', function (evt) {
 
-    // Added.
+    
     if (evt.detail.target.id == 'url_request') {
-    var ok =  document.getElementById('ok').value;
-        if (ok == 'True') {
+      var ok =  document.getElementById('ok').value;
+      if (ok == 'True') {
             // Payment link is successfully created. Opening Invoice link.
             var result_url =  document.getElementById('result').value;
             window.Telegram.WebApp.openInvoice(result_url);
             return;
         }
-      }
-    // Ended
+    }
+
+    if (evt.detail.target.id == 'balance') { 
+      var balance = document.getElementById("balance").value;
+      document.getElementById('span_balance').innerText = 'Balance: ' + balance + ' chips';
+      return;
+    }
 
     var win_value = document.getElementById("win_value").value;
     var info = document.getElementById("info");
@@ -313,7 +320,8 @@
   //Flipping cards before the draw and return to normal place after the hold animation.
   document.body.addEventListener('htmx:confirm', function (evt) {
 
-    if (evt.detail.target.id == 'url_request') {
+    if (evt.detail.target.id == 'url_request' || evt.detail.target.id == 'balance') {
+      console.log(evt.detail.target.id, " captured.");
       return;
     }
     var balance = document.getElementById("balance").value;
