@@ -210,13 +210,20 @@
 
 
 <script>
+    // Get the root element
+    const root = document.documentElement;
 
+    // Get the styles of the root element
+    const rootStyles = getComputedStyle(root);
+
+    // Access the CSS variable
+    const baseColor = rootStyles.getPropertyValue('--base-color').trim();
    
-
+    Telegram.WebApp.setHeaderColor(baseColor);
 
   Telegram.WebApp.onEvent('invoiceClosed', function (object) {
     if (object.status == 'paid') {
-      // Invoice is paid. Refreshing the page by dealing the new hand.
+      // Invoice is paid. Refreshing the balance by invoking hx-get 'update_balance'.
       htmx.trigger("#hide_modal", "click");
     }
   });

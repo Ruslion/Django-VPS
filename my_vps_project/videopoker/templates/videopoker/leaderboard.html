@@ -51,6 +51,18 @@
 </form> 
 </div>
 <script>
+
+    // Get the root element
+    const root = document.documentElement;
+
+    // Get the styles of the root element
+    const rootStyles = getComputedStyle(root);
+
+    // Access the CSS variable
+    const baseColor = rootStyles.getPropertyValue('--base-color').trim();
+   
+    Telegram.WebApp.setHeaderColor(baseColor);
+    
     document.body.addEventListener('htmx:configRequest', function (evt) {
         if (evt.detail.elt.tagName == 'TH') {
             const keywords_list = ['day', 'week', 'month', 'all-time' ];
