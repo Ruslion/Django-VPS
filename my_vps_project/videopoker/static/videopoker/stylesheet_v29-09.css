@@ -9,7 +9,7 @@
 
 body {
   background-color: var(--base-color);
-  font-family: "JetBrains Mono",monospace;
+  font-family: "Roboto";
   color: var(--third-color);
 }
 
@@ -43,7 +43,7 @@ select {
   color:var(--third-color);
   background-color: var(--base-color);
   font-size:medium;
-  font-family: "JetBrains Mono",monospace;
+  
   
 }
 
@@ -132,7 +132,6 @@ div.buttons, div.balance {
   color: #fff;
   cursor: pointer;
   display: inline-flex;
-  font-family: "JetBrains Mono",monospace;
   height: 48px;
   justify-content: center;
   line-height: 1;
@@ -229,6 +228,8 @@ div.buttons, div.balance {
     vertical-align: middle;
     height:100%;
     transform: rotateY(180deg);
+    font-family: "Agency FB";
+    font-weight: bold;
   }
   
   /* Style the back side */
