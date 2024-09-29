@@ -131,7 +131,8 @@
   
   <div class="buttons">
     <button name="bet_button" id="bet_button" type="button" class="button" role="button" onclick="bet_increase()">Bet</button>
-    <button type="button" id="deal_button" class="button" role="button" hx-post="/videopoker/deal/" hx-target="#table">Deal</button>
+    <button type="button" id="deal_button" class="button" role="button" hx-post="/videopoker/deal/" hx-target="#table"
+        hx-trigger="click throttle:0.25s">Deal</button>
   </div>
   <input type="hidden" name="bet_m" id="bet_m" value="1">
   
@@ -194,9 +195,12 @@
 
           </div>
           <div style="display: grid;">
-          <span style="text-align:center">Free 2000 chips</span>
+          <span style="text-align:center">Share with a friend to get 2000 chips</span>
           
           <button class="button" onclick="share()">Share with a friend</button>
+          <span style="text-align:center">Watch add to get 100 chips</span>
+          
+          <button class="button" id="ad" disabled="true">Show Ad (testing)</button>
         </div>
           <input type="hidden" name="amount" id="amount" value="0">
           
@@ -353,7 +357,6 @@
       if (held_cards_value >= values[index]) {
         held_cards_value = held_cards_value - values[index];
       } else {
-
         document.getElementById("card_" + index).classList.remove('flip-animation');
       }
       
@@ -440,5 +443,24 @@
       var tel = window.Telegram.WebApp;
       tel.openTelegramLink('https://t.me/share/url?url=https://t.me/VideoPokerMiniAppBot/VideoPoker?startapp=refr_id{{telegram_id}}');
     }
+</script>
+<script>
+  // insert your block id
+  const AdController = window.Adsgram.init({ blockId: "3073",
+    debug: true,
+    debugBannerType: "FullscreenMedia"
+   });
+  const button = document.getElementById('ad');
+  button.addEventListener('click', () => {
+      AdController.show().then((result) => {
+          // user watch ad till the end
+          // your code to reward user
+          alert('Reward');
+      }).catch((result) => {
+          // user skipped video or get error during playing ad
+          // do nothing or whatever you want
+          alert(JSON.stringify(result, null, 4));
+      })
+  })
 </script>
 {% endblock %}

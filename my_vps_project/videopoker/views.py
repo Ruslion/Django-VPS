@@ -443,6 +443,7 @@ def update_balance(request, user_id=None):
             result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s", (user_id,))
             if result_balance: # Record in database found
                 context['balance'] = result_balance[0][0]
+                request.session['balance'] = result_balance[0][0]
                 return render(request, "videopoker/update_balance.html", context)
             else:
                 # Record not found in the database

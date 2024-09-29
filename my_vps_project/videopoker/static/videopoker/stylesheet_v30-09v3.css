@@ -197,12 +197,12 @@ div.buttons, div.balance {
     height: 100%;
     text-align: center;
     transform-style: preserve-3d;
-    transition: transform 0.4s;
+    transition: transform 0.2s;
     
   }
 
   .flip-animation {
-    transition: transform 0.2s;
+    transition: transform 0.3s linear;
     transform: rotateY(180deg);
     
   }
