@@ -202,7 +202,7 @@ div.buttons, div.balance {
   }
 
   .flip-animation {
-    transition: transform 0.4s;
+    transition: transform 0.2s;
     transform: rotateY(180deg);
     
   }
@@ -243,7 +243,7 @@ div.buttons, div.balance {
   .row_combination {
     background-color: var(--second-color) !important;
     color:var(--fourth-color);
-    font-weight: bold;
+    
   }
   tr:nth-child(even) {
     background-color: var(--fourth-color);
