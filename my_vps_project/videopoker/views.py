@@ -142,10 +142,20 @@ def index(request):
                 is_premium = user_data.get('is_premium', False)
                 photo_url = user_data.get('photo_url', False)
                 username = user_data.get('username', 'No_user_name')
+                username = username[:500] # Avoid overflow
+                first_name = user_data.get('first_name', "")
+                first_name = first_name[:200] # Avoid overflow
+                last_name = user_data.get('last_name', "")
+                last_name = first_name[:200] # Avoid overflow
+                allows_write_to_pm = user_data.get('allows_write_to_pm', False)
+                lang_code = user_data.get('language_code', "")
 
-                data_tuple = (user_data['id'], user_data['first_name'], user_data['last_name'], username,
-                            user_data['language_code'], user_data['allows_write_to_pm'], is_premium, photo_url,
-                            INITIAL_CHIPS_AMOUNT)
+                data_tuple = (user_data['id'], 
+                                first_name,
+                                last_name,
+                                username,
+                                lang_code, allows_write_to_pm, is_premium, photo_url,
+                                INITIAL_CHIPS_AMOUNT)
                 result = database_connect.execute_insert_update_sql(insert_user_sql, data_tuple)
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance']  = INITIAL_CHIPS_AMOUNT
