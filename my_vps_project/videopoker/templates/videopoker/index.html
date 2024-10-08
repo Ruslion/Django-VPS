@@ -197,10 +197,10 @@
           <div style="display: grid;">
           <span style="text-align:center">Share with a friend to get 2000 chips</span>
           
-          <button class="button" onclick="share()">Share with a friend</button>
+          <button class="button" onclick="share()" type="button">Share with a friend</button>
           <span style="text-align:center">Watch Ad to get 100 chips</span>
           
-          <button class="button" id="ad">Show Ad (testing)</button>
+          <button class="button" id="ad" type="button">Show Ad (testing)</button>
           <span style="text-align:center;font-size:small">Note: Playing chips cannot be converted, sold, gifted or used elsewhere but this application.</span>
         </div>
           <input type="hidden" name="amount" id="amount" value="0">
@@ -445,23 +445,5 @@
       tel.openTelegramLink('https://t.me/share/url?url=https://t.me/VideoPokerMiniAppBot/VideoPoker?startapp=refr_id{{telegram_id}}');
     }
 </script>
-<script>
-  // insert your block id
-  const AdController = window.Adsgram.init({ blockId: "3073",
-    debug: true,
-    debugBannerType: "FullscreenMedia"
-   });
-  const button = document.getElementById('ad');
-  button.addEventListener('click', () => {
-      AdController.show().then((result) => {
-          // user watch ad till the end
-          // your code to reward user
-          console.log(result);
-      }).catch((result) => {
-          // user skipped video or get error during playing ad
-          // do nothing or whatever you want
-          alert(JSON.stringify(result, null, 4));
-      })
-  });
-</script>
+<script src="{% static 'videopoker/adsgram.js' %}"></script>
 {% endblock %}

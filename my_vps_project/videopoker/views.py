@@ -13,6 +13,7 @@ TEL_TOKEN = os.environ['TEL_TOKEN']
 INITIAL_CHIPS_AMOUNT = 5000 # The amount given at registration.
 FRIEND_REF_AMOUNT = 2000
 AD_VIEWED_AMOUNT = 100
+ADSGRAM_VIEWS_LIMIT = 20
 BET_MIN = 100 # The minimum amount of chips bet.
 EMPTY_CONTEXT = {'drawn_cards': [1, 2, 3, 4, 5],
                 'dealt':False} # Empty context is used as placeholder for the first call of the index page.
@@ -135,8 +136,8 @@ def index(request):
             else:
                 # The record is not in database yet. Creating new record.
                 insert_user_sql = '''INSERT INTO videopoker_users (telegram_id, first_name, last_name, username, language_code, 
-                                allows_write_to_pm, is_premium, photo_url, balance) 
-                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;
+                                allows_write_to_pm, is_premium, photo_url, balance, adsgram_views_today, adsgram_viewed_day) 
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;
                 
                 '''
                 is_premium = user_data.get('is_premium', False)
@@ -146,7 +147,7 @@ def index(request):
                 first_name = user_data.get('first_name', "")
                 first_name = first_name[:200] # Avoid overflow
                 last_name = user_data.get('last_name', "")
-                last_name = first_name[:200] # Avoid overflow
+                last_name = last_name[:200] # Avoid overflow
                 allows_write_to_pm = user_data.get('allows_write_to_pm', False)
                 lang_code = user_data.get('language_code', "")
 
@@ -155,7 +156,7 @@ def index(request):
                                 last_name,
                                 username,
                                 lang_code, allows_write_to_pm, is_premium, photo_url,
-                                INITIAL_CHIPS_AMOUNT)
+                                INITIAL_CHIPS_AMOUNT, ADSGRAM_VIEWS_LIMIT, datetime.now())
                 result = database_connect.execute_insert_update_sql(insert_user_sql, data_tuple)
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance']  = INITIAL_CHIPS_AMOUNT
@@ -423,6 +424,8 @@ def createInvoiceLink(request):
             return JsonResponse ({"ok":False,"result":"Invalid amount. Failed"})
 
 def adsgramReward(request):
+    ''' This view is invoked from Adsgram servers to verify that Ad was viewed.
+    '''
     if request.method == "GET":
         # Request method GET. Verifying variables.
         user_id = request.GET.get('userid', False)
@@ -446,6 +449,9 @@ def adsgramReward(request):
         return JsonResponse ({"ok":False,"result":"Method other than GET detected. Failed"})
 
 def update_balance(request, user_id=None):
+    ''' This function returns updated balance in the following HTML tags.
+    <input type="hidden"  id="balance" value="{{balance}}">
+    '''
     context = {'balance': 0}
     
     if request.method == "GET":
@@ -457,7 +463,7 @@ def update_balance(request, user_id=None):
                 return render(request, "videopoker/update_balance.html", context)
             else:
                 # Record not found in the database
-                print("Record not found in the database")
+                print(f"Record {user_id} not found in the database")
                 return render(request, "videopoker/update_balance.html", context)
         else:
             # user_id parameter not found

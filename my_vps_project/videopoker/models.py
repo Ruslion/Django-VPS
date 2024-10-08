@@ -10,6 +10,8 @@ class Users(models.Model):
     photo_url = models.TextField(blank=True)
     allows_write_to_pm = models.BooleanField(default=False)
     balance = models.PositiveBigIntegerField(default = 5000)
+    adsgram_views_today = models.SmallIntegerField(default = 20)
+    adsgram_viewed_day = models.DateField(auto_now_add=True, editable=True)
 
 class Hands_dealt(models.Model):
     user_id = models.ForeignKey("Users", on_delete=models.CASCADE)
