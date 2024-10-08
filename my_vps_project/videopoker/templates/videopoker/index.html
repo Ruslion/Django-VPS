@@ -5,7 +5,10 @@
 <div class="title">
   <h2>Jacks or better</h2>
   <a  href="/videopoker/leaderboard/"><button class="menu_button"><img style="max-width:10vw;" src="{% static 'videopoker/ladder.png' %}" title="Leaderboard"></button></a>
-  <button class="menu_button" onclick="show_modal()"><img style="max-width: 10vw;cursor:pointer;" src="{% static 'videopoker/chips.png' %}"></button>
+  <button id="chips_menu" class="menu_button" onclick="show_modal()" hx-target="#adsgram_div"
+                                                    hx-get="/videopoker/update_adsgram_div/{{telegram_id}}">
+  <img style="max-width: 10vw;cursor:pointer;" src="{% static 'videopoker/chips.png' %}">
+  </button>
 </div>
 <div>
   <table class="multiplier_table">  
@@ -198,9 +201,11 @@
           <span style="text-align:center">Share with a friend to get 2000 chips</span>
           
           <button class="button" onclick="share()" type="button">Share with a friend</button>
-          <span style="text-align:center">Watch Ad to get 100 chips</span>
-          
-          <button class="button" id="ad" type="button">Show Ad (testing)</button>
+          <div id="adsgram_div" style="display: grid;">
+            <span style="text-align:center">Watch Ad to get 100 chips</span>
+            <span style="text-align:center;font-size:small">20 out of 20</span>
+            <button onclick ="show_adsgram()" class="button" id="ad" type="button">Show Ad</button>
+          </div>
           <span style="text-align:center;font-size:small">Note: Playing chips cannot be converted, sold, gifted or used elsewhere but this application.</span>
         </div>
           <input type="hidden" name="amount" id="amount" value="0">
@@ -253,6 +258,13 @@
       document.getElementById('span_balance').innerText = 'Balance: ' + balance + ' chips';
       return;
     }
+
+    if (evt.detail.target.id == 'adsgram_div') { 
+      // var ad = document.getElementById("ad");
+      // ad.setAttribute('onclick', 'show_adsgram()');
+      return;
+    }
+
 
     var win_value = document.getElementById("win_value").value;
     var info = document.getElementById("info");
@@ -332,7 +344,7 @@
   //Flipping cards before the draw and return to normal place after the hold animation.
   document.body.addEventListener('htmx:confirm', function (evt) {
 
-    if (evt.detail.target.id == 'url_request' || evt.detail.target.id == 'balance') {
+    if (evt.detail.target.id == 'url_request' || evt.detail.target.id == 'balance' || evt.detail.target.id == 'adsgram_div') {
       console.log(evt.detail.target.id, " captured.");
       return;
     }
@@ -432,6 +444,7 @@
     function show_modal() {
         var modal = document.querySelector('.modal-backdrop');
         modal.classList.add('active');
+        //htmx.trigger("#ad", "click"); // Rendering the adsgram div with updated data.
     }
 
     function hide_modal(evt) {
@@ -445,5 +458,23 @@
       tel.openTelegramLink('https://t.me/share/url?url=https://t.me/VideoPokerMiniAppBot/VideoPoker?startapp=refr_id{{telegram_id}}');
     }
 </script>
-<script src="{% static 'videopoker/adsgram.js' %}"></script>
+<script>
+  // insert your block id
+  
+const AdController = window.Adsgram.init({ blockId: "3755", 
+    debug: false,
+    debugBannerType: "FullscreenMedia"  });
+const button = document.getElementById('ad');
+function show_adsgram() {
+        htmx.trigger("#chips_menu", "click");
+        AdController.show().then((result) => {
+            // user watch ad till the end
+            // your code to reward user
+        }).catch((result) => {
+            // user skipped video or get error during playing ad
+            // do nothing or whatever you want
+            alert(JSON.stringify(result, null, 4));
+        })
+}
+</script>
 {% endblock %}

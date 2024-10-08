@@ -1,0 +1,11 @@
+{% if adsgram_views_today > 0 %}
+<span style="text-align:center">Watch Ad to get 100 chips</span>
+<span style="text-align:center;font-size:small">{{adsgram_views_today}} out of 20</span>
+<button onclick ="show_adsgram()"  class="button" id="ad" type="button" hx-target="#adsgram_div"
+                                            hx-get="/videopoker/update_adsgram_div/{{telegram_id}}">Show Ad</button>
+{% else %}
+<span style="text-align:center;font-size:small">No more ads to watch for today. Check tomorrow.</span>
+<button onclick ="show_adsgram()"  class="button" id="ad" type="button" style="visibility: hidden;"
+            hx-target="#adsgram_div"
+            hx-get="/videopoker/update_adsgram_div/{{telegram_id}}">Show Ad</button>
+{% endif %}

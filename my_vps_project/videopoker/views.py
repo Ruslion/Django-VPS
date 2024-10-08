@@ -436,7 +436,8 @@ def adsgramReward(request):
             result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (user_id,))
             if result_balance: # Record in database found
                 # Updating user's balance
-                balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s WHERE telegram_id = %s RETURNING balance;'''
+                balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s, adsgram_views_today = adsgram_views_today - 1
+                         WHERE telegram_id = %s RETURNING balance;'''
                 result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (AD_VIEWED_AMOUNT, user_id))
                 return JsonResponse ({"ok":True,"result":"Reward has been accrued."})
             else:
@@ -470,3 +471,39 @@ def update_balance(request, user_id=None):
             return render(request, "videopoker/update_balance.html", context)
     else:
         return render(request, "videopoker/update_balance.html", context)
+
+def update_adsgram_div(request, user_id=None):
+    ''' This function renders adsgram div with updated information of the following format.
+            <span style="text-align:center">Watch Ad to get 100 chips</span>
+            <span style="text-align:center;font-size:small">{{adsgram_views_today}} out of 20</span>
+            <button class="button" id="ad" type="button">Show Ad</button>
+    '''
+    context = {'adsgram_views_today': 0,
+                'telegram_id': request.session['telegram_id']}
+    if request.method == "GET":
+        if user_id:
+            result_adsgram_views = database_connect.execute_select_sql("SELECT adsgram_views_today, adsgram_viewed_day FROM videopoker_users WHERE telegram_id = %s", (user_id,))
+            if result_adsgram_views: # Record in database found
+                today = datetime.today().date()
+                if today > result_adsgram_views[0][1]:
+                    # Need to reset the adsgram_views to ADSGRAM_VIEWS_LIMIT
+                    update_adsgram_sql = '''UPDATE videopoker_users SET adsgram_views_today = %s,
+                                            adsgram_viewed_day = %s 
+                                            WHERE telegram_id = %s RETURNING adsgram_views_today;'''
+                    result_update_adsgram_views = database_connect.execute_insert_update_sql(update_adsgram_sql, (ADSGRAM_VIEWS_LIMIT,
+                                                                                                                    today, user_id))
+                    context['adsgram_views_today'] = ADSGRAM_VIEWS_LIMIT
+                    return render(request, "videopoker/update_adsgram_div.html", context)
+                else:
+                    context['adsgram_views_today'] = result_adsgram_views[0][0]
+                    return render(request, "videopoker/update_adsgram_div.html", context)
+            else:
+                # Record not found in the database
+                print(f"Record {user_id} not found in the database. update_adsgram_div.html")
+                return render(request, "videopoker/update_adsgram_div.html", context)
+        else:
+            # user_id parameter not found
+            return render(request, "videopoker/update_adsgram_div.html", context)
+    else:
+        # Method POST is used
+        return render(request, "videopoker/update_adsgram_div.html", context)
