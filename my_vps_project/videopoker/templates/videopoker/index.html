@@ -5,8 +5,7 @@
 <div class="title">
   <h2>Jacks or better</h2>
   <a  href="/videopoker/leaderboard/"><button class="menu_button"><img style="max-width:10vw;" src="{% static 'videopoker/ladder.png' %}" title="Leaderboard"></button></a>
-  <button id="chips_menu" class="menu_button" onclick="show_modal()" hx-target="#adsgram_div"
-                                                    hx-get="/videopoker/update_adsgram_div/{{telegram_id}}">
+  <button class="menu_button" onclick="show_modal()">
   <img style="max-width: 10vw;cursor:pointer;" src="{% static 'videopoker/chips.png' %}">
   </button>
 </div>
@@ -202,9 +201,13 @@
           
           <button class="button" onclick="share()" type="button">Share with a friend</button>
           <div id="adsgram_div" style="display: grid;">
-            <span style="text-align:center">Watch Ad to get 100 chips</span>
-            <span style="text-align:center;font-size:small">20 out of 20</span>
-            <button onclick ="show_adsgram()" class="button" id="ad" type="button">Show Ad</button>
+            {% if adsgram_views_today > 0 %}
+                <span style="text-align:center">Watch Ad to get 100 chips</span>
+                <span style="text-align:center;font-size:small">{{adsgram_views_today}} out of 20</span>
+                <button onclick ="show_adsgram()"  class="button" id="ad" type="button">Show Ad</button>
+            {% else %}
+                <span style="text-align:center;font-size:small">No more ads to watch for today. Check tomorrow.</span>
+            {% endif %}
           </div>
           <span style="text-align:center;font-size:small">Note: Playing chips cannot be converted, sold, gifted or used elsewhere but this application.</span>
         </div>
@@ -218,7 +221,8 @@
 </div>
 
 
-
+<input id='update_ads_views' type="hidden" hx-target="#adsgram_div" hx-trigger="click"
+  hx-get="/videopoker/update_adsgram_div/{{telegram_id}}">
 <script>
     // Get the root element
     const root = document.documentElement;
@@ -444,7 +448,7 @@
     function show_modal() {
         var modal = document.querySelector('.modal-backdrop');
         modal.classList.add('active');
-        //htmx.trigger("#ad", "click"); // Rendering the adsgram div with updated data.
+        
     }
 
     function hide_modal(evt) {
@@ -466,10 +470,11 @@ const AdController = window.Adsgram.init({ blockId: "3755",
     debugBannerType: "FullscreenMedia"  });
 const button = document.getElementById('ad');
 function show_adsgram() {
-        htmx.trigger("#chips_menu", "click");
+        
         AdController.show().then((result) => {
             // user watch ad till the end
             // your code to reward user
+            htmx.trigger("#update_ads_views", "click");
         }).catch((result) => {
             // user skipped video or get error during playing ad
             // do nothing or whatever you want

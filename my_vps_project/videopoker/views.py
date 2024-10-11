@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .helpers import deal_draw
 from .helpers.init_data_verification import check_webapp_signature
 from .helpers import database_connect
+from .helpers import views_helper
 from django.http import JsonResponse
 import os
 import json
@@ -12,7 +13,7 @@ import requests
 TEL_TOKEN = os.environ['TEL_TOKEN']
 INITIAL_CHIPS_AMOUNT = 5000 # The amount given at registration.
 FRIEND_REF_AMOUNT = 2000
-AD_VIEWED_AMOUNT = 100
+AD_VIEWED_REWARD = 100
 ADSGRAM_VIEWS_LIMIT = 20
 BET_MIN = 100 # The minimum amount of chips bet.
 EMPTY_CONTEXT = {'drawn_cards': [1, 2, 3, 4, 5],
@@ -82,6 +83,7 @@ def index(request):
             if result_balance: # Record in database found
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
                 EMPTY_CONTEXT['telegram_id'] = telegram_id
+                EMPTY_CONTEXT['adsgram_views_today'] = views_helper.get_adsgram_views_today(telegram_id)
                 request.session['balance'] = result_balance[0][0]
                 request.session['user_id'] = result_balance[0][1]
                 request.session['win_value'] = 0
@@ -119,7 +121,7 @@ def index(request):
             return redirect("https://t.me/VideoPokerMiniAppBot/VideoPoker")
 
         if valid_data:
-            # Data valid
+            # Data is valid
             # Verifying whether in db or not
             user_data = json.loads(parsed_data['user'])
             telegram_id = int(user_data['id'])
@@ -130,6 +132,7 @@ def index(request):
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
                 EMPTY_CONTEXT['telegram_id'] = telegram_id
+                EMPTY_CONTEXT['adsgram_views_today'] = views_helper.get_adsgram_views_today(telegram_id)
                 request.session['balance'] = result_balance[0][0]
                 request.session['user_id'] = result_balance[0][1]
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
@@ -150,7 +153,8 @@ def index(request):
                 last_name = last_name[:200] # Avoid overflow
                 allows_write_to_pm = user_data.get('allows_write_to_pm', False)
                 lang_code = user_data.get('language_code', "")
-
+                lang_code = lang_code[:4]
+                
                 data_tuple = (user_data['id'], 
                                 first_name,
                                 last_name,
@@ -161,6 +165,7 @@ def index(request):
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance']  = INITIAL_CHIPS_AMOUNT
                 EMPTY_CONTEXT['telegram_id'] = telegram_id
+                EMPTY_CONTEXT['adsgram_views_today'] = ADSGRAM_VIEWS_LIMIT
                 request.session['balance'] = INITIAL_CHIPS_AMOUNT
                 request.session['user_id'] = result[0]
 
@@ -426,6 +431,7 @@ def createInvoiceLink(request):
 def adsgramReward(request):
     ''' This view is invoked from Adsgram servers to verify that Ad was viewed.
     '''
+    print('adsgramReward link triggered.')
     if request.method == "GET":
         # Request method GET. Verifying variables.
         user_id = request.GET.get('userid', False)
@@ -436,15 +442,17 @@ def adsgramReward(request):
             result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (user_id,))
             if result_balance: # Record in database found
                 # Updating user's balance
-                balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s, adsgram_views_today = adsgram_views_today - 1
-                         WHERE telegram_id = %s RETURNING balance;'''
-                result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (AD_VIEWED_AMOUNT, user_id))
+                # balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s, adsgram_views_today = adsgram_views_today - 1
+                #          WHERE telegram_id = %s RETURNING balance;'''
+                # result_balance = database_connect.execute_insert_update_sql(balance_update_sql, (AD_VIEWED_REWARD, user_id))
+                print("Adsgram reward is accrued.")
                 return JsonResponse ({"ok":True,"result":"Reward has been accrued."})
             else:
                 # Record not found in the database
                 return JsonResponse ({"ok":False,"result":"The user_id not found in the database. Failed"})
         else:
             # Either key is wrong or user_id not sent with parameters.
+            print("Either key is wrong or user_id was not sent. Failed")
             return JsonResponse ({"ok":False,"result":"Either key is wrong or user_id was not sent. Failed"})
     else:
         return JsonResponse ({"ok":False,"result":"Method other than GET detected. Failed"})
@@ -479,24 +487,17 @@ def update_adsgram_div(request, user_id=None):
             <button class="button" id="ad" type="button">Show Ad</button>
     '''
     context = {'adsgram_views_today': 0,
-                'telegram_id': request.session['telegram_id']}
+                'telegram_id': user_id}
     if request.method == "GET":
         if user_id:
             result_adsgram_views = database_connect.execute_select_sql("SELECT adsgram_views_today, adsgram_viewed_day FROM videopoker_users WHERE telegram_id = %s", (user_id,))
             if result_adsgram_views: # Record in database found
-                today = datetime.today().date()
-                if today > result_adsgram_views[0][1]:
-                    # Need to reset the adsgram_views to ADSGRAM_VIEWS_LIMIT
-                    update_adsgram_sql = '''UPDATE videopoker_users SET adsgram_views_today = %s,
-                                            adsgram_viewed_day = %s 
-                                            WHERE telegram_id = %s RETURNING adsgram_views_today;'''
-                    result_update_adsgram_views = database_connect.execute_insert_update_sql(update_adsgram_sql, (ADSGRAM_VIEWS_LIMIT,
-                                                                                                                    today, user_id))
-                    context['adsgram_views_today'] = ADSGRAM_VIEWS_LIMIT
-                    return render(request, "videopoker/update_adsgram_div.html", context)
-                else:
-                    context['adsgram_views_today'] = result_adsgram_views[0][0]
-                    return render(request, "videopoker/update_adsgram_div.html", context)
+                # Updating balance and adsgram_views_today
+                balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s, adsgram_views_today = adsgram_views_today - 1
+                    WHERE telegram_id = %s RETURNING adsgram_views_today;'''
+                result_adsgram_views = database_connect.execute_insert_update_sql(balance_update_sql, (AD_VIEWED_REWARD, user_id))
+                context['adsgram_views_today'] = result_adsgram_views[0]
+                return render(request, "videopoker/update_adsgram_div.html", context)    
             else:
                 # Record not found in the database
                 print(f"Record {user_id} not found in the database. update_adsgram_div.html")
