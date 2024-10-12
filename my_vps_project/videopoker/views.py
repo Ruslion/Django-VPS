@@ -488,23 +488,24 @@ def update_adsgram_div(request, user_id=None):
     '''
     context = {'adsgram_views_today': 0,
                 'telegram_id': user_id}
-    if request.method == "GET":
-        if user_id:
-            result_adsgram_views = database_connect.execute_select_sql("SELECT adsgram_views_today, adsgram_viewed_day FROM videopoker_users WHERE telegram_id = %s", (user_id,))
-            if result_adsgram_views: # Record in database found
+    if request.method == "GET" and user_id:
+        result_adsgram_views = database_connect.execute_select_sql("SELECT adsgram_views_today, adsgram_viewed_day FROM videopoker_users WHERE telegram_id = %s", (user_id,))
+        if result_adsgram_views: # Record in database found
+            if result_adsgram_views[0][0] > 0:
                 # Updating balance and adsgram_views_today
                 balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s, adsgram_views_today = adsgram_views_today - 1
                     WHERE telegram_id = %s RETURNING adsgram_views_today;'''
                 result_adsgram_views = database_connect.execute_insert_update_sql(balance_update_sql, (AD_VIEWED_REWARD, user_id))
                 context['adsgram_views_today'] = result_adsgram_views[0]
-                return render(request, "videopoker/update_adsgram_div.html", context)    
+                return render(request, "videopoker/update_adsgram_div.html", context)
             else:
-                # Record not found in the database
-                print(f"Record {user_id} not found in the database. update_adsgram_div.html")
+                # Potential hacking. Not accruing the balance.
+                context['adsgram_views_today'] = 0
                 return render(request, "videopoker/update_adsgram_div.html", context)
         else:
-            # user_id parameter not found
+            # Record not found in the database
+            print(f"Record {user_id} not found in the database. update_adsgram_div.html")
             return render(request, "videopoker/update_adsgram_div.html", context)
     else:
-        # Method POST is used
+        # Method other than GET is used OR user_id parameter not found
         return render(request, "videopoker/update_adsgram_div.html", context)
