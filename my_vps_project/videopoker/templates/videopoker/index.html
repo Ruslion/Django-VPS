@@ -275,7 +275,12 @@
 
     // Access the CSS variable
     const baseColor = rootStyles.getPropertyValue('--base-color').trim();
-   
+    const info = document.getElementById("info");
+    const audio = document.getElementById("audio");
+    const audio_win = document.getElementById("audio_win");
+    const bet_button = document.getElementById("bet_button");
+    const deal_button = document.getElementById("deal_button");
+
     Telegram.WebApp.setHeaderColor(baseColor);
 
   Telegram.WebApp.onEvent('invoiceClosed', function (object) {
@@ -314,13 +319,9 @@
 
 
     var win_value = document.getElementById("win_value").value;
-    var info = document.getElementById("info");
     var dealt = document.getElementById("dealt").value;
-    var audio = document.getElementById("audio");
-    var audio_win = document.getElementById("audio_win");
     var comb = document.getElementById("combination").value;
-    var bet_button = document.getElementById("bet_button");
-    var deal_button = document.getElementById("deal_button");
+    
 
     if (win_value > 0) {
 
