@@ -25,6 +25,10 @@ class Hands_dealt(models.Model):
 
 class Combinations(models.Model):
     combination = models.CharField(max_length=20)
+    bronze = models.PositiveIntegerField()
+    silver = models.PositiveIntegerField()
+    gold = models.PositiveIntegerField()
+    platinum = models.PositiveIntegerField()
 
 class SuccessfulPayment(models.Model):
     date_time = models.DateTimeField(auto_now_add=True)
