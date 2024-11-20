@@ -113,12 +113,19 @@ select {
 div.buttons, div.balance {
   width: 100%;
   display: flex;
+  margin:auto;
 }
 
 .menu_button {
   border-radius: 6px;
   background: none;
   margin: auto 5px;
+  background-size: contain; /* or 'cover' */
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor:pointer;
+  width:12vw;
+  height:12vw;
 }
 
 .button {
@@ -168,10 +175,12 @@ div.buttons, div.balance {
 .title {
   width: 100%;
   display: flex;
+  margin:auto;
 }
 .hand, .held {
     display:flex;
     width: 100%;
+    margin:auto;
 }
 
 .held-caption {
@@ -186,7 +195,7 @@ div.buttons, div.balance {
     width: 18vw;
     height: 27vw; /* Proportion of 1x1.5
     perspective: 1000px; /* Remove this if you don't want the 3D effect */
-    margin: 1%;
+    margin: 5px auto;
     transition: transform 0.3s;
   }
   
@@ -330,4 +339,38 @@ div.buttons, div.balance {
   padding: 5px;
   border-color: var(--second-color);
   text-align: center;
+}
+
+@media (orientation: landscape) {
+        .multiplier_table {
+          width:50%;
+          font-size:small;
+        }
+
+        .leaderboard {
+          /* table-layout: fixed; */
+          width:50%;
+          font-size:medium;
+        }
+
+        .hand, .held {
+          width: 50%;
+      }
+
+      div.buttons, div.balance {
+        width: 50%;
+      }
+
+      .flip-card {
+        width: 9vw;
+        height: 13vw; 
+      }
+      .menu_button {
+        width:6vw;
+        height:6vw;
+      }
+
+      .title {
+        width:50%;
+      }
 }

@@ -4,9 +4,8 @@
 {% block content %}
 <div class="title">
   <h2>Jacks or better</h2>
-  <a  href="/videopoker/leaderboard/"><button class="menu_button"><img style="max-width:10vw;" src="{% static 'videopoker/ladder.png' %}" title="Leaderboard"></button></a>
-  <button class="menu_button" onclick="show_modal()">
-  <img style="max-width: 10vw;cursor:pointer;" src="{% static 'videopoker/chips.png' %}">
+  <a  href="/videopoker/leaderboard/"><button class="menu_button" style="background-image: url('{% static 'videopoker/ladder.png' %}');"></button></a>
+  <button class="menu_button" onclick="show_modal()" style = "background-image: url('{% static 'videopoker/chips.png' %}');">
   </button>
 </div>
 <div>
@@ -524,7 +523,7 @@ function show_adsgram() {
         }).catch((result) => {
             // user skipped video or get error during playing ad
             // do nothing or whatever you want
-            alert(JSON.stringify(result, null, 4));
+            
         })
 }
 </script>
