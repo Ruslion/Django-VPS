@@ -3,12 +3,14 @@
 
 {% block content %}
 <div class="title">
-  <h2>Jacks or better</h2>
-  <a  href="/videopoker/leaderboard/"><button class="menu_button" style="background-image: url('{% static 'videopoker/ladder.png' %}');"></button></a>
-  <button class="menu_button" onclick="show_modal()" style = "background-image: url('{% static 'videopoker/chips.png' %}');">
-  </button>
+  <h2 style="margin:5px auto;">Jacks or better</h2>
 </div>
-<div>
+<div class = "container">
+  <div class="button-container">
+    <button class="menu_button" style="background-image: url('{% static 'videopoker/ladder.png' %}');"
+            onclick="window.location.href='/videopoker/leaderboard/';"></button>
+    <button class="menu_button" onclick="show_modal()" style = "background-image: url('{% static 'videopoker/chips.png' %}');"></button>
+  </div>
   <table class="multiplier_table">  
     <colgroup>
       <col id="col_0">
@@ -92,6 +94,7 @@
     </tr>
 
   </table>
+  <div style="width: 25%;"></div>
 </div>
 <form style="display: grid;">
   {% csrf_token %}
