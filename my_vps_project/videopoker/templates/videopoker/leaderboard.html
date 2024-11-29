@@ -4,10 +4,7 @@
 {% block content %}
 <div >
     <div class="title">    
-    <a  href="/videopoker/"  style="text-decoration: none;">
-        <button class="menu_button"><span style="font-size:xx-large">⇐</span></button>
-    </a>
-    <h2>Leaderboard<br>Top 100</h2> 
+    <h2>Leaderboard Top 100</h2> 
     </div>
     <div style="margin: 5px auto;width: fit-content;text-align: center;">Server time: {{server_time}}</div>
 <form>     {% csrf_token %}
@@ -58,8 +55,13 @@
 
     // Access the CSS variable
     const baseColor = rootStyles.getPropertyValue('--base-color').trim();
-   
+    
+    
     Telegram.WebApp.setHeaderColor(baseColor);
+    Telegram.WebApp.BackButton.show();
+    Telegram.WebApp.onEvent('backButtonClicked', function (object) {
+        window.location.href='/videopoker/';
+    });
     
     document.body.addEventListener('htmx:configRequest', function (evt) {
         if (evt.detail.elt.tagName == 'TH') {
