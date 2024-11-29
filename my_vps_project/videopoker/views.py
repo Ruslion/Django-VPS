@@ -79,11 +79,11 @@ def index(request):
         if telegram_id:
             # Telegram id found in session variable.
             # Verifying record in database.
+            EMPTY_CONTEXT['adsgram_views_today'] = views_helper.get_adsgram_views_today_and_add_daily_bonus(telegram_id)
             result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
             if result_balance: # Record in database found
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
                 EMPTY_CONTEXT['telegram_id'] = telegram_id
-                EMPTY_CONTEXT['adsgram_views_today'] = views_helper.get_adsgram_views_today_and_add_daily_bonus(telegram_id)
                 request.session['balance'] = result_balance[0][0]
                 request.session['user_id'] = result_balance[0][1]
                 request.session['win_value'] = 0
@@ -125,6 +125,7 @@ def index(request):
             # Verifying whether in db or not
             user_data = json.loads(parsed_data['user'])
             telegram_id = int(user_data['id'])
+            EMPTY_CONTEXT['adsgram_views_today'] = views_helper.get_adsgram_views_today_and_add_daily_bonus(telegram_id)
             result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
             
             if result_balance:
@@ -132,7 +133,6 @@ def index(request):
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
                 EMPTY_CONTEXT['telegram_id'] = telegram_id
-                EMPTY_CONTEXT['adsgram_views_today'] = views_helper.get_adsgram_views_today_and_add_daily_bonus(telegram_id)
                 request.session['balance'] = result_balance[0][0]
                 request.session['user_id'] = result_balance[0][1]
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
