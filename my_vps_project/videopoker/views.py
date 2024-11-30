@@ -79,11 +79,11 @@ def index(request):
         if telegram_id:
             # Telegram id found in session variable.
             # Verifying record in database.
-            EMPTY_CONTEXT['adsgram_views_today'] = views_helper.get_adsgram_views_today_and_add_daily_bonus(telegram_id)
-            result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
+            result_balance = views_helper.get_balance_id_adsgram_views_today_and_add_daily_bonus(telegram_id)
             if result_balance: # Record in database found
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
                 EMPTY_CONTEXT['telegram_id'] = telegram_id
+                EMPTY_CONTEXT['adsgram_views_today'] = result_balance[0][2]
                 request.session['balance'] = result_balance[0][0]
                 request.session['user_id'] = result_balance[0][1]
                 request.session['win_value'] = 0
@@ -125,14 +125,14 @@ def index(request):
             # Verifying whether in db or not
             user_data = json.loads(parsed_data['user'])
             telegram_id = int(user_data['id'])
-            EMPTY_CONTEXT['adsgram_views_today'] = views_helper.get_adsgram_views_today_and_add_daily_bonus(telegram_id)
-            result_balance = database_connect.execute_select_sql("SELECT balance, id FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
+            result_balance = views_helper.get_balance_id_adsgram_views_today_and_add_daily_bonus(telegram_id)
             
             if result_balance:
                 # The record is in database
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
                 EMPTY_CONTEXT['telegram_id'] = telegram_id
+                EMPTY_CONTEXT['adsgram_views_today'] = result_balance[0][2]
                 request.session['balance'] = result_balance[0][0]
                 request.session['user_id'] = result_balance[0][1]
                 return render(request, "videopoker/index.html", EMPTY_CONTEXT)
@@ -489,22 +489,19 @@ def update_adsgram_div(request, user_id=None):
     context = {'adsgram_views_today': 0,
                 'telegram_id': user_id}
     if request.method == "GET" and user_id:
-        result_adsgram_views = database_connect.execute_select_sql("SELECT adsgram_views_today, adsgram_viewed_day FROM videopoker_users WHERE telegram_id = %s", (user_id,))
-        if result_adsgram_views: # Record in database found
-            if result_adsgram_views[0][0] > 0:
-                # Updating balance and adsgram_views_today
-                balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s, adsgram_views_today = adsgram_views_today - 1
-                    WHERE telegram_id = %s RETURNING adsgram_views_today;'''
-                result_adsgram_views = database_connect.execute_insert_update_sql(balance_update_sql, (AD_VIEWED_REWARD, user_id))
-                context['adsgram_views_today'] = result_adsgram_views[0]
-                return render(request, "videopoker/update_adsgram_div.html", context)
-            else:
-                # Potential hacking. Not accruing the balance.
-                context['adsgram_views_today'] = 0
-                return render(request, "videopoker/update_adsgram_div.html", context)
+        
+        # Updating balance and adsgram_views_today
+        balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s, adsgram_views_today = adsgram_views_today - 1
+            WHERE telegram_id = %s AND adsgram_views_today > 0 RETURNING adsgram_views_today;'''
+        result_adsgram_views = database_connect.execute_insert_update_sql(balance_update_sql, (AD_VIEWED_REWARD, user_id))
+
+        if result_adsgram_views:
+            context['adsgram_views_today'] = result_adsgram_views[0]
+            return render(request, "videopoker/update_adsgram_div.html", context)
         else:
-            # Record not found in the database
-            print(f"Record {user_id} not found in the database. update_adsgram_div.html")
+            # Potential hacking or user not found. Not accruing the balance.
+            print(f"Potential hacking or user {user_id} not found. Not accruing the balance.")
+            context['adsgram_views_today'] = 0
             return render(request, "videopoker/update_adsgram_div.html", context)
     else:
         # Method other than GET is used OR user_id parameter not found
