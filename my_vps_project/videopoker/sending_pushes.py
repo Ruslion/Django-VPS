@@ -50,17 +50,17 @@ async def main():
 
     params = {'chat_id': 0,
           'parse_mode':'HTML',
-          'text': '''🃏 Video Poker Fans! Ready for a royal challenge? 👑
+          'text': '''🎰 Big news for Video Poker lovers! 🃏
           
-Did you know there are 2,598,960 unique hand combinations in 5-card draw? Yet, the elusive Royal Flush appears only once in 649,740 hands on average!
+💫 Two exciting features just launched:
 
-Can you beat the odds? Our game uses virtual chips, so it's all about skill, no financial risk!
+🤝 Join our Affiliate Program & earn 30% revenue share! Simply open bot info, click the Affiliate Program link (if you do not see the link make sure your Telegram is updated), and start earning while playing!
 
-🏆 In the leaderboard you may find who took the first row for the last week and month.
+🎁 FREE 300 chips daily just for logging in! That's right - show up daily, claim your chips, and boost your gameplay!
 
-Will you top the leaderboard this week? Login now and show us your poker face!
-Remember, every hand could be that 1 in 649,740.
-Good luck!''',
+Ready to step up your poker game?
+
+Play, compete, earn! 🏆''',
           'disable_notification': 'true',
           'reply_markup':reply_markup
           }

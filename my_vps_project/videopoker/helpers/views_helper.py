@@ -17,7 +17,7 @@ def get_balance_id_adsgram_views_today_and_add_daily_bonus(user_id):
                                     WHERE telegram_id = %s RETURNING balance, id, adsgram_views_today;'''
             result_update_adsgram_views = database_connect.execute_insert_update_sql(update_adsgram_sql, (ADSGRAM_VIEWS_LIMIT,
                                                                                                             today, user_id))
-            return result_update_adsgram_views
+            return (result_update_adsgram_views, )
         else:
             return result_adsgram_views     
     else:

@@ -265,7 +265,7 @@ div.buttons, div.balance {
 
   
 .modal-backdrop {
-  /* display: none; */
+  display:flex;
   position: fixed; 
   z-index: 1; 
   left: 0;
@@ -277,6 +277,7 @@ div.buttons, div.balance {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+  vertical-align: middle;
   
 }
 
@@ -287,6 +288,7 @@ div.buttons, div.balance {
 .modal-backdrop.active .modal-content {
   transform: scale(1);
   opacity: 1;
+  
 }
 
 
@@ -308,7 +310,7 @@ div.buttons, div.balance {
 .modal-content {
   border-radius: 10px;
   background-color: var(--base-color);
-  margin: var(--tg-content-safe-area-inset-top) auto auto;
+  margin: auto;
   padding: 5px 10px;
   border: 3px solid var(--third-color);
   width: clamp(200px, 80vw, 700px);
