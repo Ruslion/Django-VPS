@@ -10,13 +10,13 @@
 <form>     {% csrf_token %}
 <table class="leaderboard">
     <tr>
-        <th id="day" class="selected_filter" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Today</th>
-        <th id="week" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Last Week</th>
-        <th id="month" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">Last Month</th>
-        <th id="all-time" hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="click">All-time</th>
+        <th id="day" class="selected_filter" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">Today</th>
+        <th id="week" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">Last Week</th>
+        <th id="month" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">Last Month</th>
+        <th id="all-time" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">All-time</th>
         <th id="locale">
             Locale
-            <select id='locale_filter' name='locale_filter' hx-post="/videopoker/leaders/" hx-target="#leaderboard_table" hx-trigger="change">
+            <select id='locale_filter' name='locale_filter' hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="change">
             <option value="all">All</option>
             {% for loc in locale%}
                 <option value="{{loc}}">{{loc}}</option>
@@ -24,29 +24,20 @@
         </select></th>
     </tr>
 </table>
-<br>
-<table class="leaderboard" id="leaderboard_table">
-    
-    <tr><td style="font-size: medium;">#</td>
-        <td style="font-size: medium;">First Name</td>
-        <td style="font-size: medium;">Last Name</td>
-        <td style="font-size: medium;">Amount Won</td>
-    </tr>
-    {% for telegram_id, first_name, last_name, won in leaders%}
-    <tr  {% if telegram_id == tel_id %}class="row_combination"{% endif %}>
-        <td>{{forloop.counter}}</td>
-        <td>{{first_name}}</td>
-        <td>{{last_name}}</td>
-        <td>{{won}}</td>
-    </tr>
-    {% endfor %}
-</table>
+<div id="leaderboard_section">
+    <!-- To be filled by HTMX.trigger-->
+</div>
+
+
 <input id='filter' name="filter" type="hidden" value="day">
 <!-- <input id='locale_filter' name='locale_filter' type="hidden" value="all"> -->
 </form> 
 </div>
 <script>
-
+    window.onload = function() {
+        htmx.trigger("#day", "click");
+    }
+    
     // Get the root element
     const root = document.documentElement;
 

@@ -354,9 +354,116 @@ div.buttons, div.balance {
   justify-content: space-evenly;
   display: flex;
   flex-direction: row;
-
-
 }
+
+/* Top three leaders section */
+
+.top-winners {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* Aligns items to bottom */
+  padding: 10px;
+}
+
+.winner-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  padding-bottom: 5px;
+  border-radius: 8px;
+  background: var(--fourth-color);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 22%;
+  width:30%;
+  margin: auto 2vw;
+}
+
+/* First place styling */
+.winner-card.first-place {
+  padding-top: 30px; /* Extra padding for crown */
+  transform: scale(1.1); /* Make it slightly larger */
+  z-index: 2; /* Ensure it's above others */
+  
+}
+
+/* Second place styling */
+.winner-card.second-place {
+  margin-top: 30px; /* Push it down */
+  
+}
+
+/* Third place styling */
+.winner-card.third-place {
+  margin-top: 30px; /* Push it down */
+  
+}
+
+.crown-icon {
+  position: absolute;
+  top: -5px;
+  width: 48px;
+  height: 48px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+ 
+}
+
+.avatar.placement-1 { 
+  border: 5px solid #FFD700;
+  width: 60px; /* Slightly larger */
+  height: 60px;
+}
+.avatar.placement-2 { border: 5px solid #C0C0C0; }
+.avatar.placement-3 { border: 5px solid #CD7F32; }
+
+.name {
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+  font-size: clamp(10px, 14px, 24px);
+}
+
+
+.amount {
+  
+  font-size:clamp(10px, 14px, 8vw);;
+  text-align: center;
+}
+
+.first-place .amount {
+  font-weight: bold;
+}
+
+.position {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.first-place .position {
+  width: 28px; /* Slightly larger */
+  height: 28px;
+}
+
+.position.placement-1 { background: #FFD700; }
+.position.placement-2 { background: #C0C0C0; }
+.position.placement-3 { background: #CD7F32; }
+
+/* End of Top three leaders section*/
 
 @media (orientation: landscape) {
         .multiplier_table {
@@ -407,6 +514,11 @@ div.buttons, div.balance {
 
       h2 {
         font-size: medium;
+      }
+
+      .top-winners {
+        width:50%;
+        margin:auto;
       }
       
 }

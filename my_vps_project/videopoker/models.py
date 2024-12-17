@@ -39,6 +39,7 @@ class SuccessfulPayment(models.Model):
     telegram_payment_charge_id = models.CharField(max_length=512)
     provider_payment_charge_id = models.CharField(max_length=512)
 
+# The following class will be used to store the all-time agrregated stats in order to avoid recalculation.
 class All_Time_stats(models.Model):
     user_id = models.ForeignKey("Users", on_delete=models.CASCADE)
     hands_dealt = models.PositiveBigIntegerField()

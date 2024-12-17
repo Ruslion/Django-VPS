@@ -1,13 +1,50 @@
-<tr><td style="font-size: medium;">#</td>
-    <td style="font-size: medium;">First Name</td>
-    <td style="font-size: medium;">Last Name</td>
-    <td style="font-size: medium;">Amount Won</td>
-</tr>
-{% for telegram_id, first_name, last_name, won in leaders%}
-<tr {% if telegram_id == tel_id %}class="row_combination"{% endif %}>
-    <td >{{forloop.counter}}</td>
-    <td>{{first_name}}</td>
-    <td>{{last_name}}</td>
-    <td>{{won}}</td>
-</tr>
-{% endfor %}
+{% load static %}
+<!-- Top 3 Winners -->
+<div class="top-winners">
+    <!-- 2nd Place -->
+    
+    {% with second_place=leaders|slice:"1:2"|first %}
+    <div class="winner-card second-place">
+        <img src="{% static 'videopoker/Crown-2.png' %}" class="crown-icon" alt="Crown">
+        <img src="{% static 'videopoker/user_icon.png' %}" class="avatar placement-2">
+        <div class="name">{{second_place.1}} {{second_place.2}}</div>
+        <div class="amount">{{second_place.3}} chips</div>
+        <div class="position placement-2">2</div>
+    </div>
+    {% endwith %}
+
+    <!-- 1st Place -->
+    {% with first_place=leaders|slice:":1"|first %}
+    <div class="winner-card first-place">
+        <img src="{% static 'videopoker/Crown-1.png' %}" class="crown-icon" alt="Crown">
+        <img src="{% static 'videopoker/user_icon.png' %}" class="avatar placement-1">
+        <div class="name">{{first_place.1}} {{first_place.2}}</div>
+        <div class="amount">{{first_place.3}} chips</div>
+        <div class="position placement-1">1</div>
+    </div>
+    {% endwith %}
+    
+
+    <!-- 3rd Place -->
+    {% with third_place=leaders|slice:"2:3"|first %}
+    <div class="winner-card third-place">
+        <img src="{% static 'videopoker/Crown-3.png' %}" class="crown-icon" alt="Crown">
+        <img src="{% static 'videopoker/user_icon.png' %}" class="avatar placement-3">
+        <div class="name">{{third_place.1}} {{third_place.2}}</div>
+        <div class="amount">{{third_place.3}} chips</div>
+        <div class="position placement-3">3</div>
+    </div>
+    {% endwith %}
+    
+</div>
+<table class="leaderboard">
+    
+    {% for telegram_id, first_name, last_name, won, photo_url in leaders|slice:"3:" %}
+    <tr  {% if telegram_id == tel_id %}class="row_combination"{% endif %}>
+        <td>{{forloop.counter|add:3}}</td>
+        <td>{{first_name}}</td>
+        <td>{{last_name}}</td>
+        <td>{{won}}</td>
+    </tr>
+    {% endfor %}
+</table>

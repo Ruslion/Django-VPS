@@ -291,7 +291,7 @@ def deal(request):
 
 def leaderboard(request):
     # Selecting leaders for the previous day
-    select_leaders_sql = '''SELECT telegram_id, first_name, last_name, SUM(win_amount) AS win from videopoker_hands_dealt hd 
+    select_leaders_sql = '''SELECT telegram_id, first_name, last_name, SUM(win_amount) AS win, photo_url from videopoker_hands_dealt hd 
                             JOIN videopoker_users u ON u.id = hd.user_id_id
                             WHERE hd.date_time = CURRENT_DATE AND hd.win_amount > 0
                             GROUP BY u.id
@@ -333,7 +333,7 @@ def leaders(request):
     filter_for_sql = request.POST.get('filter', None)
     filter_loc_for_sql = request.POST.get('locale_filter', None)
 
-    select_leaders_sql = '''SELECT telegram_id, first_name, last_name, SUM(win_amount) AS win from videopoker_hands_dealt hd 
+    select_leaders_sql = '''SELECT telegram_id, first_name, last_name, SUM(win_amount) AS win, photo_url from videopoker_hands_dealt hd 
                             JOIN videopoker_users u ON u.id = hd.user_id_id
                             WHERE hd.win_amount > 0 AND '''
                             # AND u.language_code LIKE %s
