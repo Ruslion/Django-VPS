@@ -290,24 +290,12 @@ def deal(request):
         return render(request, "videopoker/deal.html", CLOWN_CONTEXT)
 
 def leaderboard(request):
-    # Selecting leaders for the previous day
-    select_leaders_sql = '''SELECT telegram_id, first_name, last_name, SUM(win_amount) AS win, photo_url from videopoker_hands_dealt hd 
-                            JOIN videopoker_users u ON u.id = hd.user_id_id
-                            WHERE hd.date_time = CURRENT_DATE AND hd.win_amount > 0
-                            GROUP BY u.id
-                            ORDER by win DESC, first_name
-                            LIMIT 100;'''
-    result_leaders = database_connect.execute_select_sql(select_leaders_sql, None)
-    
-    
-
     select_locale_sql = '''SELECT language_code FROM videopoker_users
                             GROUP BY language_code
                             ORDER by language_code;
                         '''
     result_locale = database_connect.execute_select_sql(select_locale_sql, None)
-    context = {'leaders':result_leaders,
-                'locale':[l[0] for l in result_locale],
+    context = {'locale':[l[0] for l in result_locale],
                 'server_time':datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 'tel_id': request.session['telegram_id']
             }
