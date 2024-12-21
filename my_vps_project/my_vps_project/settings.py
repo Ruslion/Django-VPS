@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
-SECRET_KEY_FALLBACKS = ['django-insecure-zk4iob5p+*a2o5a8p)9h@6*l&yu_wmma&7w_ol)r9o%1kn8*3i']
+# SECRET_KEY_FALLBACKS = ['django-insecure-zk4iob5p+*a2o5a8p)9h@6*l&yu_wmma&7w_ol)r9o%1kn8*3i']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -31,6 +31,7 @@ DEBUG = False
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # SECURE_HSTS_SECONDS = 3600
 # SECURE_HSTS_INCLUDE_SUBDOMAINS = True

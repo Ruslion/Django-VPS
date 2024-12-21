@@ -106,7 +106,6 @@ def index(request):
                     # Saving ref_user_id in session for future use.
                     request.session['ref_user_id'] = refr_id
 
-
         # Sending to login page
         return render(request, "videopoker/login.html")
     # If POST request but no session 'telegram_id' varialbe

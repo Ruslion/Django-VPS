@@ -50,6 +50,7 @@ select {
 .selected_filter {
   background-color: var(--fourth-color);
   border: 1px solid;
+  border-radius: 8px;
 }
 
 .multiplier_table {
@@ -60,6 +61,7 @@ select {
   font-size:medium;
   color:var(--third-color);
   text-align: left;
+  border-radius: 8px;
 }
 
 .leaderboard {
@@ -71,6 +73,7 @@ select {
   font-size:small;
   color:var(--third-color);
   text-align: center;
+  border-radius: 8px;
 }
 
 .leaderboard > tr > td {

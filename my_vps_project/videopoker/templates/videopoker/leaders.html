@@ -6,7 +6,7 @@
     {% with second_place=leaders|slice:"1:2"|first %}
     <div class="winner-card second-place">
         <img src="{% static 'videopoker/Crown-2.png' %}" class="crown-icon" alt="Crown">
-        {% if second_place.4 == 'false' %}
+        {% if second_place.4 == 'false' or not second_place %} 
             <img src="{% static 'videopoker/user_icon.png' %}" class="avatar placement-2">
         {% else %}
             <img src="{{second_place.4}}" class="avatar placement-2">
@@ -21,12 +21,19 @@
     {% with first_place=leaders|slice:":1"|first %}
     <div class="winner-card first-place">
         <img src="{% static 'videopoker/Crown-1.png' %}" class="crown-icon" alt="Crown">
-        {% if first_place.4 == 'false' %}
-            <img src="{% static 'videopoker/user_icon.png' %}" class="avatar placement-2">
+        {% if first_place.4 == 'false' or not first_place %}
+            <img src="{% static 'videopoker/user_icon.png' %}" class="avatar placement-1">
         {% else %}
-            <img src="{{first_place.4}}" class="avatar placement-2">
+            <img src="{{first_place.4}}" class="avatar placement-1">
         {% endif %}
-        <div class="name">{{first_place.1}} {{first_place.2}}</div>
+
+        {% if not first_place %}
+            <div class="name">Empty Throne</div>
+        {% else %}
+            <div class="name">{{first_place.1}} {{first_place.2}}</div>
+        {% endif %}
+
+        
         <div class="amount">{{first_place.3}}</div>
         <div class="position placement-1">1</div>
     </div>
@@ -37,10 +44,10 @@
     {% with third_place=leaders|slice:"2:3"|first %}
     <div class="winner-card third-place">
         <img src="{% static 'videopoker/Crown-3.png' %}" class="crown-icon" alt="Crown">
-        {% if third_place.4 == 'false' %}
-            <img src="{% static 'videopoker/user_icon.png' %}" class="avatar placement-2">
+        {% if third_place.4 == 'false' or not third_place %}
+            <img src="{% static 'videopoker/user_icon.png' %}" class="avatar placement-3">
         {% else %}
-            <img src="{{third_place.4}}" class="avatar placement-2">
+            <img src="{{third_place.4}}" class="avatar placement-3">
         {% endif %}
         <div class="name">{{third_place.1}} {{third_place.2}}</div>
         <div class="amount">{{third_place.3}}</div>
@@ -58,5 +65,7 @@
         <td>{{last_name}}</td>
         <td>{{won}}</td>
     </tr>
+    {% empty %}
+    <tr><td>Even a pair of Jacks beats an empty seat!</td></tr>
     {% endfor %}
 </table>
