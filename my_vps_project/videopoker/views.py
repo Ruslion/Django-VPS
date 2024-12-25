@@ -444,52 +444,52 @@ def adsgramReward(request):
     else:
         return JsonResponse ({"ok":False,"result":"Method other than GET detected. Failed"})
 
-def update_balance(request, user_id=None):
+def update_balance(request, telegram_id=None):
     ''' This function returns updated balance in the following HTML tags.
     <input type="hidden"  id="balance" value="{{balance}}">
     '''
     context = {'balance': 0}
     
     if request.method == "GET":
-        if user_id:
-            result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s", (user_id,))
+        if telegram_id:
+            result_balance = database_connect.execute_select_sql("SELECT balance FROM videopoker_users WHERE telegram_id = %s", (telegram_id,))
             if result_balance: # Record in database found
                 context['balance'] = result_balance[0][0]
                 request.session['balance'] = result_balance[0][0]
                 return render(request, "videopoker/update_balance.html", context)
             else:
                 # Record not found in the database
-                print(f"Record {user_id} not found in the database")
+                print(f"Record {telegram_id} not found in the database")
                 return render(request, "videopoker/update_balance.html", context)
         else:
-            # user_id parameter not found
+            # telegram_id parameter not found
             return render(request, "videopoker/update_balance.html", context)
     else:
         return render(request, "videopoker/update_balance.html", context)
 
-def update_adsgram_div(request, user_id=None):
+def update_adsgram_div(request, telegram_id=None):
     ''' This function renders adsgram div with updated information of the following format.
             <span style="text-align:center">Watch Ad to get 100 chips</span>
             <span style="text-align:center;font-size:small">{{adsgram_views_today}} out of 20</span>
             <button class="button" id="ad" type="button">Show Ad</button>
     '''
     context = {'adsgram_views_today': 0,
-                'telegram_id': user_id}
-    if request.method == "GET" and user_id:
+                'telegram_id': telegram_id}
+    if request.method == "GET" and telegram_id:
         
         # Updating balance and adsgram_views_today
         balance_update_sql = '''UPDATE videopoker_users SET balance = balance + %s, adsgram_views_today = adsgram_views_today - 1
             WHERE telegram_id = %s AND adsgram_views_today > 0 RETURNING adsgram_views_today;'''
-        result_adsgram_views = database_connect.execute_insert_update_sql(balance_update_sql, (AD_VIEWED_REWARD, user_id))
+        result_adsgram_views = database_connect.execute_insert_update_sql(balance_update_sql, (AD_VIEWED_REWARD, telegram_id))
 
         if result_adsgram_views:
             context['adsgram_views_today'] = result_adsgram_views[0]
             return render(request, "videopoker/update_adsgram_div.html", context)
         else:
             # Potential hacking or user not found. Not accruing the balance.
-            print(f"Potential hacking or user {user_id} not found. Not accruing the balance.")
+            print(f"Potential hacking or user {telegram_id} not found. Not accruing the balance.")
             context['adsgram_views_today'] = 0
             return render(request, "videopoker/update_adsgram_div.html", context)
     else:
-        # Method other than GET is used OR user_id parameter not found
+        # Method other than GET is used OR telegram_id parameter not found
         return render(request, "videopoker/update_adsgram_div.html", context)
