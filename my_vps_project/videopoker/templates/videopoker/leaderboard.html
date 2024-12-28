@@ -10,7 +10,7 @@
 <form>     {% csrf_token %}
 <table class="leaderboard">
     <tr>
-        <th id="day" class="selected_filter" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">Today</th>
+        <th id="week_start" class="selected_filter" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">This week</th>
         <th id="week" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">Last Week</th>
         <th id="month" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">Last Month</th>
         <th id="all-time" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">All-time</th>
@@ -35,7 +35,7 @@
 </div>
 <script>
     window.onload = function() {
-        htmx.trigger("#day", "click");
+        htmx.trigger("#week_start", "click");
     }
     
     // Get the root element
@@ -56,7 +56,7 @@
     
     document.body.addEventListener('htmx:configRequest', function (evt) {
         if (evt.detail.elt.tagName == 'TH') {
-            const keywords_list = ['day', 'week', 'month', 'all-time' ];
+            const keywords_list = ['week_start', 'week', 'month', 'all-time' ];
             let i = 0;
             // Removing class 'selected_filter'
             while (i < keywords_list.length) {

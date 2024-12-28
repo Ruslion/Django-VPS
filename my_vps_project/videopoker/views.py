@@ -348,8 +348,10 @@ def leaders(request):
                             ORDER by win DESC, first_name
                             LIMIT 100;'''
     match filter_for_sql:
-        case 'day':
-            filter_for_sql = 'hd.date_time = CURRENT_DATE'
+        case 'week_start':
+            today = datetime.today().date()
+            week_start = today - timedelta(days=today.weekday())
+            filter_for_sql = f"""hd.date_time >='{week_start}'"""
         case 'week':
             # Need to calculate the dates for the previous week
             today = datetime.today().date()
