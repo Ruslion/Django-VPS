@@ -124,10 +124,41 @@ def index(request):
             # Verifying whether in db or not
             user_data = json.loads(parsed_data['user'])
             telegram_id = int(user_data['id'])
+            is_premium = user_data.get('is_premium', False)
+            photo_url = user_data.get('photo_url', False)
+            username = user_data.get('username', 'No_user_name')
+            username = username[:500] # Avoid overflow
+            first_name = user_data.get('first_name', "")
+            first_name = first_name[:200] # Avoid overflow
+            last_name = user_data.get('last_name', "")
+            last_name = last_name[:200] # Avoid overflow
+            allows_write_to_pm = user_data.get('allows_write_to_pm', False)
+            lang_code = user_data.get('language_code', "")
+            lang_code = lang_code[:4]
+
             result_balance = views_helper.get_balance_id_adsgram_views_today_and_add_daily_bonus(telegram_id)
-            
+
             if result_balance:
-                # The record is in database
+                # The record is in database.
+                # Need to update user record if there are differences.
+                if any([result_balance[0][3] != username,
+                        result_balance[0][4] != first_name ,
+                        result_balance[0][5] != last_name,
+                        result_balance[0][6] != photo_url,
+                        ]) and result_balance[0][1] != 1:
+                    update_user_sql = '''UPDATE videopoker_users SET username = %s,
+                                    first_name = %s,
+                                    last_name = %s, 
+                                    language_code = %s,
+                                    is_premium = %s,
+                                    photo_url = %s,
+                                    allows_write_to_pm = %s 
+                                    WHERE telegram_id = %s RETURNING balance, id, adsgram_views_today, 
+                                    username, first_name, last_name, photo_url;'''
+                    result_update = database_connect.execute_insert_update_sql(update_user_sql, (username, first_name, last_name,
+                                                                                lang_code, is_premium, photo_url, allows_write_to_pm,
+                                                                                telegram_id))
+                
                 request.session['telegram_id'] = int(telegram_id)
                 EMPTY_CONTEXT['balance'] = result_balance[0][0]
                 EMPTY_CONTEXT['telegram_id'] = telegram_id
@@ -140,20 +171,7 @@ def index(request):
                 insert_user_sql = '''INSERT INTO videopoker_users (telegram_id, first_name, last_name, username, language_code, 
                                 allows_write_to_pm, is_premium, photo_url, balance, adsgram_views_today, adsgram_viewed_day) 
                                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;
-                
                 '''
-                is_premium = user_data.get('is_premium', False)
-                photo_url = user_data.get('photo_url', False)
-                username = user_data.get('username', 'No_user_name')
-                username = username[:500] # Avoid overflow
-                first_name = user_data.get('first_name', "")
-                first_name = first_name[:200] # Avoid overflow
-                last_name = user_data.get('last_name', "")
-                last_name = last_name[:200] # Avoid overflow
-                allows_write_to_pm = user_data.get('allows_write_to_pm', False)
-                lang_code = user_data.get('language_code', "")
-                lang_code = lang_code[:4]
-                
                 data_tuple = (user_data['id'], 
                                 first_name,
                                 last_name,
