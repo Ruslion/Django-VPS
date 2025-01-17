@@ -38,6 +38,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # SECURE_HSTS_PRELOAD = True
 
 ALLOWED_HOSTS = ['89.116.49.9','pychampion.site', 'www.pychampion.site']
+CSRF_TRUSTED_ORIGINS = ['https://pychampion.site']
 
 
 # Application definition
@@ -45,6 +46,7 @@ ALLOWED_HOSTS = ['89.116.49.9','pychampion.site', 'www.pychampion.site']
 INSTALLED_APPS = [
     'trading_bot.apps.TradingBotConfig',
     'videopoker.apps.VideopokerConfig',
+    'rest_api_task.apps.RestApiTaskConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

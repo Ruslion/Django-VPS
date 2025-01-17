@@ -21,6 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('trading_bot/', include('trading_bot.urls')),
     path('videopoker/', include('videopoker.urls')),
-    
-    
+    path('rest_api_task/', include('rest_api_task.urls')),
 ]
