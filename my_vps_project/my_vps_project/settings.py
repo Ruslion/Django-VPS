@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'trading_bot.apps.TradingBotConfig',
     'videopoker.apps.VideopokerConfig',
     'rest_api_task.apps.RestApiTaskConfig',
+    'constance.backends.database',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,6 +55,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_spectacular',
+    'constance',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +68,38 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',  
+    ],
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_api_task.authentication.JWTAuthentication',
+    ],
+
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'REST API TASK',
+    'DESCRIPTION': 'REST API TASK 3',
+    'VERSION': '1.0.0',
+}
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+
+CONSTANCE_CONFIG = {
+    'ACCESS_TOKEN_LIFETIME_SECONDS': (30, 'Access token lifetime in seconds'),
+    'REFRESH_TOKEN_LIFETIME_DAYS': (30, 'Refresh token lifetime in days'),
+}
+
 
 ROOT_URLCONF = 'my_vps_project.urls'
 
