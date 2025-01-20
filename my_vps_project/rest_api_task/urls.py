@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import UserRegistrationView, LoginView, RefreshTokenView, LogoutView, UserProfileView
 from rest_framework.permissions import AllowAny
 
@@ -18,5 +18,6 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(permission_classes=[AllowAny], authentication_classes=[]), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema', permission_classes=[AllowAny], authentication_classes=[]), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema', permission_classes=[AllowAny], authentication_classes=[]), name='redoc'),
+    path('api/', include('rest_framework.urls', namespace='rest_framework'))
 
 ]
