@@ -10,7 +10,7 @@
     <button class="menu_button" title="Toggle fullscreen mode" onclick="full_screen()" >&#8691;</button>
     <button class="menu_button" title="Leaderboard" style="background-image: url('{% static 'videopoker/ladder.png' %}');"
             onclick="window.location.href='/videopoker/leaderboard/';"></button>
-    <button class="menu_button" title="Replenish chips" onclick="show_modal()" style = "background-image: url('{% static 'videopoker/chips.png' %}');"></button>
+    <button class="menu_button" title="Replenish chips" onclick="show_modal('replenish_chips')" style = "background-image: url('{% static 'videopoker/chips.png' %}');"></button>
   </div>
   <table class="multiplier_table">  
     <colgroup>
@@ -146,11 +146,11 @@
   <audio id="audio_win_rf" src="{% static 'videopoker/royal_flush.mp3' %}" ></audio>
 </form>
 
-<div class="modal-backdrop" >
+<div class="modal-backdrop" id="replenish_chips">
   <div class="modal-content" >
       <form>
           {% csrf_token %}
-          <div class="close" onclick="hide_modal()" id="hide_modal"
+          <div class="close" onclick="hide_modal('replenish_chips')" id="hide_modal"
                 hx-get="/videopoker/update_balance/{{telegram_id}}"
                 hx-target="#balance"
                 hx-swap="outerHTML"
@@ -494,13 +494,13 @@
 
         var elem =  evt.detail.elt.id;
         var formData = evt.detail.parameters;
-        hide_modal();
+        hide_modal('replenish_chips');
         document.getElementById('amount').value = buy_dict[elem];
         formData['amount'] = buy_dict[elem];
     });
 
-    function show_modal() {
-        var modal = document.querySelector('.modal-backdrop');
+    function show_modal(id) {
+        var modal = document.querySelector('#' + id);
         modal.classList.add('active');
         
     }
@@ -512,9 +512,9 @@
         Telegram.WebApp.requestFullscreen();
       }
     }
-    function hide_modal(evt) {
+    function hide_modal(id) {
         
-        var modal = document.querySelector('.modal-backdrop');
+        var modal = document.querySelector('#' + id);
         modal.classList.remove('active');
     }
 
