@@ -10,7 +10,7 @@
 <form>     {% csrf_token %}
 <table class="leaderboard">
     <tr>
-        <th id="week_start" class="selected_filter" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">This Week</th>
+        <th id="week_start" class="selected_filter" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="load, click">This Week</th>
         <th id="week" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">Last Week</th>
         <th id="month" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">Last Month</th>
         <th id="all-time" hx-post="/videopoker/leaders/" hx-target="#leaderboard_section" hx-trigger="click">All-time</th>
@@ -25,7 +25,7 @@
     </tr>
 </table>
 <div id="leaderboard_section">
-    <!-- To be filled by HTMX.trigger-->
+    <!-- To be filled by HTMX-->
 </div>
 
 
@@ -34,9 +34,6 @@
 </form> 
 </div>
 <script>
-    window.onload = function() {
-        htmx.trigger("#week_start", "click");
-    }
     
     // Get the root element
     const root = document.documentElement;
