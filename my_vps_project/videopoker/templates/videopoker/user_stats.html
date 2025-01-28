@@ -1,0 +1,16 @@
+<!--Some table to show the achievements-->
+<tr>
+  <th>Combinations</th>
+  <th>Hands Count</th>
+  <th>Current Cup</th>
+</tr>
+
+{% for combination, count, cur_cup in user_stats%}
+  <tr><td>{{combination}}</td>
+      <td>{{ count }}</td>
+      <td>{{cur_cup}}</td>
+      
+
+  </tr>
+
+ {% endfor %}

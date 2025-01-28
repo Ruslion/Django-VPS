@@ -11,4 +11,5 @@ urlpatterns = [
     path("adsgramReward/", views.adsgramReward, name="adsgramReward"),
     path("update_balance/<int:telegram_id>", views.update_balance, name="update_balance"),
     path("update_adsgram_div/<int:telegram_id>", views.update_adsgram_div, name="update_adsgram_div"),
+    path("user_stats/<int:telegram_id>", views.user_stats, name="user_stats"),
 ]

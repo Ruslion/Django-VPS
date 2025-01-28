@@ -8,6 +8,7 @@
 <div class = "container">
   <div class="button-container">
     <button class="menu_button" title="Toggle fullscreen mode" onclick="full_screen()" >&#8691;</button>
+    <button class="menu_button" title="User stats" onclick="show_modal('user_stats')" style = "background-image: url('{% static 'videopoker/badge_icon.png' %}');"></button>
     <button class="menu_button" title="Leaderboard" style="background-image: url('{% static 'videopoker/ladder.png' %}');"
             onclick="window.location.href='/videopoker/leaderboard/';"></button>
     <button class="menu_button" title="Replenish chips" onclick="show_modal('replenish_chips')" style = "background-image: url('{% static 'videopoker/chips.png' %}');"></button>
@@ -145,6 +146,27 @@
   <audio id="audio_win" src="{% static 'videopoker/win_hand_straight_and_higher.mp3' %}" ></audio>
   <audio id="audio_win_rf" src="{% static 'videopoker/royal_flush.mp3' %}" ></audio>
 </form>
+
+<div class="modal-backdrop" id="user_stats">
+  <div class="modal-content">
+    <form hx-post="/videopoker/user_stats/{{telegram_id}}" hx-trigger="revealed" hx-target="#user_stats_table">
+      {% csrf_token %}
+      <div class="close" onclick="hide_modal('user_stats')">&#10006;</div>
+          <br>
+          <br>
+      <div class="container">
+        <div style="margin:auto;">
+        <table class = "table_prices" >
+          <tbody id="user_stats_table">
+
+          </tbody>
+          <!--To be filled by HTMX-->
+        </table>  
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
 <div class="modal-backdrop" id="replenish_chips">
   <div class="modal-content" >

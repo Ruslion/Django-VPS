@@ -513,3 +513,36 @@ def update_adsgram_div(request, telegram_id=None):
     else:
         # Method other than GET is used OR telegram_id parameter not found
         return render(request, "videopoker/update_adsgram_div.html", context)
+
+def user_stats(request, telegram_id=None):
+    context = {'user_stats':[
+        ['Some combination', 1, 2, 3, 4, 0],
+    ]}
+
+    if request.method == "POST" and telegram_id:
+        user_stats_select_sql = '''SELECT cmb.combination, count(hd.final_comb_id), 
+                                    CASE
+                                        WHEN count(hd.final_comb_id) >= cmb.platinum THEN 'Platinum'
+                                        WHEN count(hd.final_comb_id) >= cmb.gold THEN 'Gold'
+                                        WHEN count(hd.final_comb_id) >= cmb.silver THEN 'Silver'
+                                        WHEN count(hd.final_comb_id) >= cmb.bronze THEN 'Bronze'
+                                        ELSE 'Not yet'
+                                    END as current_cup
+                FROM videopoker_hands_dealt hd
+                RIGHT JOIN videopoker_combinations cmb
+                ON hd.final_comb_id = cmb.id AND cmb.combination != 'No value' 
+                JOIN videopoker_users users ON users.id = hd.user_id_id AND users.telegram_id = %s
+                GROUP BY cmb.id
+                ORDER BY cmb.id DESC;
+
+        '''
+        result_user_stats = database_connect.execute_select_sql(user_stats_select_sql, (telegram_id,))
+        if result_user_stats:
+            context['user_stats'] = result_user_stats
+            return render(request, "videopoker/user_stats.html", context)
+    
+    # Returning in other cases (GET, invalid telegram_id)
+    return render(request, "videopoker/user_stats.html", context)
+    
+
+   
