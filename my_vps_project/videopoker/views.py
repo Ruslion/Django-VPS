@@ -520,20 +520,19 @@ def user_stats(request, telegram_id=None):
     ]}
 
     if request.method == "POST" and telegram_id:
-        user_stats_select_sql = '''SELECT cmb.combination, count(hd.final_comb_id), 
+        user_stats_select_sql = '''WITH tmp AS(SELECT hd.final_comb_id as comb_id 
+                                    FROM videopoker_hands_dealt hd 
+                                    JOIN videopoker_users users ON hd.user_id_id = users.id AND users.telegram_id = %s AND hd.final_comb_id > 1) 
+                                    SELECT cmb.combination, count(tmp.comb_id) as count, 
                                     CASE
-                                        WHEN count(hd.final_comb_id) >= cmb.platinum THEN 'Platinum'
-                                        WHEN count(hd.final_comb_id) >= cmb.gold THEN 'Gold'
-                                        WHEN count(hd.final_comb_id) >= cmb.silver THEN 'Silver'
-                                        WHEN count(hd.final_comb_id) >= cmb.bronze THEN 'Bronze'
+                                        WHEN count(tmp.comb_id) >= cmb.platinum THEN 'Platinum'
+                                        WHEN count(tmp.comb_id) >= cmb.gold THEN 'Gold'
+                                        WHEN count(tmp.comb_id) >= cmb.silver THEN 'Silver'
+                                        WHEN count(tmp.comb_id) >= cmb.bronze THEN 'Bronze'
                                         ELSE 'Not yet'
-                                    END as current_cup
-                FROM videopoker_hands_dealt hd
-                RIGHT JOIN videopoker_combinations cmb
-                ON hd.final_comb_id = cmb.id AND cmb.combination != 'No value' 
-                JOIN videopoker_users users ON users.id = hd.user_id_id AND users.telegram_id = %s
-                GROUP BY cmb.id
-                ORDER BY cmb.id DESC;
+                                    END as current_cup  
+                                    FROM videopoker_combinations cmb LEFT JOIN tmp ON cmb.id = tmp.comb_id WHERE cmb.id >1 
+                                    GROUP BY cmb.id ORDER BY cmb.id DESC;
 
         '''
         result_user_stats = database_connect.execute_select_sql(user_stats_select_sql, (telegram_id,))
