@@ -400,9 +400,10 @@ def leaders(request):
 
 def createInvoiceLink(request, amount_to_buy=None):
     # This function returns InvoiceLink for payment.
-    if request.method == "GET":
-        # Request method GET. Returning nothing.
-        return JsonResponse ({"ok":False,"result":"Get method detected. Failed"})
+    context= {'ok':False,
+            'result':'Request failed',
+            'description':'Request other than POST'}
+
     
     if request.method == "POST" and amount_to_buy:
         if amount_to_buy in AMOUNT_DICT.keys():
@@ -431,7 +432,9 @@ def createInvoiceLink(request, amount_to_buy=None):
             return render(request, "videopoker/invoiceLink.html", context)
         else:
             # invalid amount
-            return JsonResponse ({"ok":False,"result":"Invalid amount. Failed"})
+            context['description'] = 'Invalid amount'
+    
+    return render(request, "videopoker/invoiceLink.html", context)
 
 def adsgramReward(request):
     ''' This view is invoked from Adsgram servers to verify that Ad was viewed.

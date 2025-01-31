@@ -145,6 +145,7 @@
   <audio id="audio" src="{% static 'videopoker/notify_win_hand.mp3' %}" ></audio>
   <audio id="audio_win" src="{% static 'videopoker/win_hand_straight_and_higher.mp3' %}" ></audio>
   <audio id="audio_win_rf" src="{% static 'videopoker/royal_flush.mp3' %}" ></audio>
+  <audio id="audio_flipcard" src="{% static 'videopoker/flipcard.mp3' %}" ></audio>
 </form>
 
 <div class="modal-backdrop" id="user_stats">
@@ -319,6 +320,7 @@
     const info = document.getElementById("info");
     const audio = document.getElementById("audio");
     const audio_win = document.getElementById("audio_win");
+    const audio_flipcard = document.getElementById("audio_flipcard");
     const bet_button = document.getElementById("bet_button");
     const deal_button = document.getElementById("deal_button");
 
@@ -336,15 +338,17 @@
 
   document.body.addEventListener('htmx:afterSettle', function (evt) {
 
-    
+    console.log(evt.detail.target.id, " captured. Settle event");
+
     if (evt.detail.target.id == 'url_request') {
       var ok =  document.getElementById('ok').value;
       if (ok == 'True') {
             // Payment link is successfully created. Opening Invoice link.
             var result_url =  document.getElementById('result').value;
             window.Telegram.WebApp.openInvoice(result_url);
-            return;
         }
+      return;
+
     }
 
     if (evt.detail.target.id == 'balance') { 
@@ -353,7 +357,7 @@
       return;
     }
 
-    if (evt.detail.target.id == 'adsgram_div') { 
+    if (evt.detail.target.id == 'adsgram_div' || evt.detail.target.id == 'user_stats_table') { 
       // var ad = document.getElementById("ad");
       // ad.setAttribute('onclick', 'show_adsgram()');
       return;
@@ -424,10 +428,19 @@
               confetti_battery();
             }
             
+          } 
+          else {
+              audio_flipcard.pause();
+              audio_flipcard.currentTime = 0;
+              audio_flipcard.play();
           }
         }
         document.getElementById("tr_" + comb).classList.add("row_combination");
       }
+    } else {
+      audio_flipcard.pause();
+      audio_flipcard.currentTime = 0;
+      audio_flipcard.play();
     }
     
     
@@ -435,9 +448,10 @@
 
   //Flipping cards before the draw and return to normal place after the hold animation.
   document.body.addEventListener('htmx:confirm', function (evt) {
+    const htmx_target = ['url_request', 'balance', 'adsgram_div', 'user_stats_table'];
 
-    if (evt.detail.target.id == 'url_request' || evt.detail.target.id == 'balance' || evt.detail.target.id == 'adsgram_div') {
-      console.log(evt.detail.target.id, " captured.");
+    if (htmx_target.includes(evt.detail.target.id)) {
+      console.log(evt.detail.target.id, " captured. Confirm event");
       return;
     }
     var balance = document.getElementById("balance").value;
