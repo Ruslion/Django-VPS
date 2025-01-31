@@ -189,34 +189,46 @@
                 <th>Buy</th>
             </tr>
             <tr>
+              <td>2 500</td>
+              <td>60&#11088;</td>
+              <td>-</td>
+              <td id="buy_2500" hx-post="/videopoker/createInvoiceLink/2500" hx-target="#url_request" 
+                  hx-trigger="click" style="cursor: pointer;" onclick="hide_modal('replenish_chips')">Buy &#128722;</td>
+          </tr>
+            <tr>
                 <td>5 000</td>
                 <td>120&#11088;</td>
                 <td>-</td>
-                <td id="buy_5000" hx-post="/videopoker/createInvoiceLink/" hx-target="#url_request" hx-trigger="click" style="cursor: pointer;">Buy &#128722;</td>
+                <td id="buy_5000" hx-post="/videopoker/createInvoiceLink/5000" hx-target="#url_request" 
+                    hx-trigger="click" style="cursor: pointer;" onclick="hide_modal('replenish_chips')">Buy &#128722;</td>
             </tr>
             <tr>
                 <td>10 000</td>
                 <td>228&#11088;</td>
                 <td>5%</td>
-                <td id="buy_10000" hx-post="/videopoker/createInvoiceLink/" hx-target="#url_request" hx-trigger="click" style="cursor: pointer;">Buy &#128722;</td>
+                <td id="buy_10000" hx-post="/videopoker/createInvoiceLink/10000" hx-target="#url_request" 
+                    hx-trigger="click" style="cursor: pointer;" onclick="hide_modal('replenish_chips')">Buy &#128722;</td>
             </tr>
             <tr>
                 <td>20 000</td>
                 <td>432&#11088;</td>
                 <td>10%</td>
-                <td id="buy_20000" hx-post="/videopoker/createInvoiceLink/" hx-target="#url_request" hx-trigger="click" style="cursor: pointer;">Buy &#128722;</td>
+                <td id="buy_20000" hx-post="/videopoker/createInvoiceLink/20000" hx-target="#url_request" 
+                    hx-trigger="click" style="cursor: pointer;" onclick="hide_modal('replenish_chips')">Buy &#128722;</td>
             </tr>
             <tr>
                 <td>40 000</td>
                 <td>816&#11088;</td>
                 <td>15%</td>
-                <td id="buy_40000" hx-post="/videopoker/createInvoiceLink/" hx-target="#url_request" hx-trigger="click" style="cursor: pointer;">Buy &#128722;</td>
+                <td id="buy_40000" hx-post="/videopoker/createInvoiceLink/40000" hx-target="#url_request" 
+                    hx-trigger="click" style="cursor: pointer;" onclick="hide_modal('replenish_chips')">Buy &#128722;</td>
             </tr>
             <tr>
                 <td>80 000</td>
                 <td>1536&#11088;</td>
                 <td>20%</td>
-                <td id="buy_80000" hx-post="/videopoker/createInvoiceLink/" hx-target="#url_request" hx-trigger="click" style="cursor: pointer;">Buy &#128722;</td>
+                <td id="buy_80000" hx-post="/videopoker/createInvoiceLink/80000" hx-target="#url_request" 
+                    hx-trigger="click" style="cursor: pointer;" onclick="hide_modal('replenish_chips')">Buy &#128722;</td>
             </tr>
             </table>
 
@@ -500,26 +512,6 @@
     document.getElementById("col_" + bet_multiplier).classList.add('bet_selected');
     document.getElementById("bet_m").value = bet_multiplier;
   }
-
-  document.body.addEventListener('htmx:configRequest', function (evt) {
-
-    
-    if (evt.detail.target.id != 'url_request') {
-      return;
-    }   
-        var buy_dict = {'buy_5000': 5000,
-                        'buy_10000': 10000,
-                        'buy_20000': 20000,
-                        'buy_40000': 40000,
-                        'buy_80000': 80000
-        };
-
-        var elem =  evt.detail.elt.id;
-        var formData = evt.detail.parameters;
-        hide_modal('replenish_chips');
-        document.getElementById('amount').value = buy_dict[elem];
-        formData['amount'] = buy_dict[elem];
-    });
 
     function show_modal(id) {
         var modal = document.querySelector('#' + id);

@@ -37,7 +37,8 @@ COMBINATIONS_FACTOR = {'Royal Flush':250, 'Straight Flush':50, 'Four of a Kind':
                    'Flush':6, 'Straight':4, 'Three of a Kind':3, 'Two pairs':2, 'Jacks or Better':1,'No value':0}
 
 # The following dictionary is used for invoice creation. The keys: amount of chips to be bought, the value is the price in stars.
-AMOUNT_DICT = {'5000':'120',
+AMOUNT_DICT = {'2500':'60',
+                    '5000':'120',
                     '10000':'228',
                     '20000':'432',
                     '40000':'816',
@@ -397,16 +398,13 @@ def leaders(request):
             'tel_id': request.session['telegram_id']}
     return render(request, "videopoker/leaders.html", context)
 
-def createInvoiceLink(request):
+def createInvoiceLink(request, amount_to_buy=None):
     # This function returns InvoiceLink for payment.
     if request.method == "GET":
         # Request method GET. Returning nothing.
         return JsonResponse ({"ok":False,"result":"Get method detected. Failed"})
     
-    if request.method == "POST":
-
-        amount_to_buy = request.POST.get('amount')
-
+    if request.method == "POST" and amount_to_buy:
         if amount_to_buy in AMOUNT_DICT.keys():
             # valid amount
             url_begin = 'https://api.telegram.org/bot'
