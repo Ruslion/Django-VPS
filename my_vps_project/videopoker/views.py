@@ -423,8 +423,17 @@ def createInvoiceLink(request, amount_to_buy=None):
                 'photo_url': 'https://pychampion.site/static/videopoker/chips.png'
                 }
             
-            result = requests.get(url_final, params=params)
-            context = json.loads(result.text)
+            try:
+                result = requests.get(url_final, params=params, timeout=2)
+            except requests.exceptions.Timeout:
+                print("Request timed out - no response from Telegram API within 2 seconds")
+                result = None
+            except requests.exceptions.RequestException as e:
+                print(f"An error occurred with Telergram API createLink: {e}")
+            
+            if result:
+                context = json.loads(result.text)
+
             if 'result' not in context.keys():
                 context['result'] = 'Request failed'
             if 'description' not in context.keys():
