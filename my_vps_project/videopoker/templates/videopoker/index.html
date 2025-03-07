@@ -8,7 +8,7 @@
 <div class = "container">
   <div class="button-container">
     <button class="menu_button" title="Toggle fullscreen mode" onclick="full_screen()" >&#8691;</button>
-    <button class="menu_button" title="User stats" onclick="show_modal('user_stats')" hx-trigger="click" hx-target="#user_stats_table"
+    <button class="menu_button" title="User stats" onclick="show_modal('user_stats')" hx-get="/videopoker/user_stats/{{telegram_id}}"  hx-trigger="click" hx-target="#user_stats_table"
           style = "background-image: url('{% static 'videopoker/badge_icon.png' %}');"></button>
     <button class="menu_button" title="Leaderboard" style="background-image: url('{% static 'videopoker/ladder.png' %}');"
             onclick="window.location.href='/videopoker/leaderboard/';"></button>
@@ -151,8 +151,6 @@
 
 <div class="modal-backdrop" id="user_stats">
   <div class="modal-content">
-    <form hx-post="/videopoker/user_stats/{{telegram_id}}">
-      {% csrf_token %}
       <div class="close" onclick="hide_modal('user_stats')">&#10006;</div>
           <h2>My stats</h2>
           <br>
@@ -160,13 +158,11 @@
         <div style="margin:auto;">
         <table class = "table_prices" >
           <tbody id="user_stats_table">
-
+              <!--To be filled by HTMX-->
           </tbody>
-          <!--To be filled by HTMX-->
         </table>  
         </div>
       </div>
-    </form>
   </div>
 </div>
 
