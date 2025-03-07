@@ -8,7 +8,8 @@
 <div class = "container">
   <div class="button-container">
     <button class="menu_button" title="Toggle fullscreen mode" onclick="full_screen()" >&#8691;</button>
-    <button class="menu_button" title="User stats" onclick="show_modal('user_stats')" style = "background-image: url('{% static 'videopoker/badge_icon.png' %}');"></button>
+    <button class="menu_button" title="User stats" onclick="show_modal('user_stats')" hx-trigger="click" hx-target="#user_stats_table"
+          style = "background-image: url('{% static 'videopoker/badge_icon.png' %}');"></button>
     <button class="menu_button" title="Leaderboard" style="background-image: url('{% static 'videopoker/ladder.png' %}');"
             onclick="window.location.href='/videopoker/leaderboard/';"></button>
     <button class="menu_button" title="Replenish chips" onclick="show_modal('replenish_chips')" style = "background-image: url('{% static 'videopoker/chips.png' %}');"></button>
@@ -150,10 +151,10 @@
 
 <div class="modal-backdrop" id="user_stats">
   <div class="modal-content">
-    <form hx-post="/videopoker/user_stats/{{telegram_id}}" hx-trigger="revealed" hx-target="#user_stats_table">
+    <form hx-post="/videopoker/user_stats/{{telegram_id}}">
       {% csrf_token %}
       <div class="close" onclick="hide_modal('user_stats')">&#10006;</div>
-          <br>
+          <h2>My stats</h2>
           <br>
       <div class="container">
         <div style="margin:auto;">
